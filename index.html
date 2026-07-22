@@ -510,6 +510,51 @@
   }
   .form-divider { border: none; border-top: 1px solid var(--border-primary); margin: 24px 0; }
 
+
+  /* ── MODALS ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--bg-primary); border-radius: 12px;
+    width: 580px; max-height: 88vh; overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+    padding: 40px 40px 36px;
+    position: relative;
+  }
+  .modal-close-btn {
+    position: absolute; top: 20px; right: 20px;
+    background: none; border: none; cursor: pointer;
+    font-size: 22px; color: var(--text-header); line-height: 1;
+    padding: 4px 8px; border-radius: 4px;
+  }
+  .modal-close-btn:hover { background: var(--bg-secondary); }
+  .modal-heading { font-size: 24px; font-weight: 700; color: var(--text-header); margin-bottom: 28px; }
+  .modal-step { font-size: 15px; font-weight: 600; color: var(--text-header); margin-bottom: 10px; margin-top: 24px; }
+  .modal-step:first-of-type { margin-top: 0; }
+  .modal-step a { color: var(--brand-blue); font-weight: 600; text-decoration: none; }
+  .modal-step a:hover { text-decoration: underline; }
+  .modal-divider { border: none; border-top: 1px solid var(--border-primary); margin: 24px 0; }
+  .modal-footer { display: flex; align-items: center; gap: 16px; margin-top: 28px; }
+  .modal-idp-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .modal-idp-icon { width: 40px; height: 40px; flex-shrink: 0; }
+  /* Warning box */
+  .warning-box {
+    background: #fef2f2; border: 1px solid #fca5a5;
+    border-radius: 8px; padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .warning-box-title { font-size: 14px; font-weight: 700; color: #dc2626; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .warning-box-body { font-size: 14px; color: #7f1d1d; line-height: 1.6; }
+  .warning-box-body ul { padding-left: 18px; margin-top: 4px; }
+  .deactivate-section { margin-bottom: 20px; }
+  .deactivate-title { font-size: 16px; font-weight: 600; color: var(--text-header); margin-bottom: 6px; }
+  .deactivate-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.5; }
+  .delete-section { border-top: 1px solid var(--border-primary); padding-top: 20px; }
+
   /* nav item label-only */
   .nav-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.4); padding: 12px 16px 4px; }
 </style>
@@ -571,10 +616,12 @@
       <svg class="nav-chevron" id="um-chevron" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>
     </div>
     <div class="nav-sub" id="um-sub" style="display:none;">
-      <div class="nav-sub-item" onclick="navTo('placeholder')">User groups</div>
-      <div class="nav-sub-item" onclick="navTo('placeholder')">IDM</div>
-      <div class="nav-sub-item" onclick="navTo('placeholder')">Admin team</div>
-      <div class="nav-sub-item" onclick="navTo('placeholder')">License manager</div>
+      <div class="nav-sub-item" id="sub-user-groups" onclick="showScreen('user-groups')">User groups</div>
+      <div class="nav-sub-item" id="sub-idm" onclick="showScreen('idm')">IDM</div>
+      <div class="nav-sub-item" id="sub-admin-team" onclick="showScreen('admin-team')">Admin team</div>
+      <div class="nav-sub-item" id="sub-license-manager" onclick="showScreen('license-manager')">License manager</div>
+      <div class="nav-sub-item" id="sub-bulk-security" onclick="showScreen('bulk-security')">Bulk security actions</div>
+      <div class="nav-sub-item" id="sub-recovery" onclick="showScreen('recovery')">Account access</div>
     </div>
 
     <!-- Authentication (expanded, active) -->
@@ -655,12 +702,12 @@
               <tr>
                 <td><div class="auth-name">Clever Passwords</div><div class="auth-desc">Username + password login via Clever</div></td>
                 <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+                <td style="width:96px;white-space:nowrap;"><button class="action-btn" title="Pause" onclick="openPauseModal('Clever Passwords')" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='Clever Passwords';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></td>
               </tr>
               <tr>
                 <td><div class="auth-name">Google IdP</div><div class="auth-desc">Sign in with Google account</div></td>
                 <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+                <td style="width:96px;white-space:nowrap;"><button class="action-btn" title="Edit" onclick="openGenericAuthModal('Google IdP')" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="action-btn" title="Pause" onclick="openPauseModal('Google IdP')" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='Google IdP';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></td>
               </tr>
 
 
@@ -669,17 +716,17 @@
               <tr>
                 <td><div class="auth-name">Badges</div><div class="auth-desc">Physical or digital badge scan (Chrome, Windows, Badges+)</div></td>
                 <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+                <td style="width:96px;white-space:nowrap;"><button class="action-btn" title="Pause" onclick="openPauseModal('Badges')" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='Badges';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></td>
               </tr>
               <tr>
-                <td><div class="auth-name">PIN</div><div class="auth-desc">Numeric PIN for MFA step-up</div></td>
+                <td><div class="auth-name">SAML 2.0</div><div class="auth-desc">Enterprise SSO via SAML</div></td>
                 <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+                <td style="width:96px;white-space:nowrap;"><button class="action-btn" title="Edit" onclick="openSamlModal()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="action-btn" title="Pause" onclick="openPauseModal('SAML 2.0')" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='SAML 2.0';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></td>
               </tr>
               <tr>
                 <td><div class="auth-name">Pictures</div><div class="auth-desc">Image-based authentication for younger students</div></td>
                 <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+                <td style="width:96px;white-space:nowrap;"><button class="action-btn" title="Pause" onclick="openPauseModal('Pictures')" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='Pictures';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></td>
               </tr>
 
 
@@ -692,13 +739,10 @@
         </div>
 
       </div>
-
-      <!-- TRUST CONDITIONS TAB -->
       <div id="authcontent-trust" style="display:none;flex:1;overflow:hidden;border-top:1px solid var(--border-primary);">
         <div class="sp-list" id="trust-list"></div>
         <div class="sp-detail" id="trust-detail"></div>
       </div>
-
     </div><!-- /screen-authenticators -->
 
     <!-- ══ SCREEN: SECURITY POLICIES ══ -->
@@ -816,7 +860,6 @@
             </div>
             <div class="reset-card-meta">User types <strong>students, teachers, staff</strong></div>
           </div>
-        </div>
 
       </div>
     </div>
@@ -981,6 +1024,188 @@
       </div>
     </div>
 
+
+    <!-- ══ USER GROUPS ══ -->
+    <div class="screen" id="screen-user-groups">
+      <div class="page-header" style="padding-bottom:20px;">
+        <div class="page-title">User groups</div>
+        <div class="page-actions">
+          <button class="btn-primary" style="background:#fff;color:var(--brand-blue);border:2px solid var(--brand-blue);font-size:14px;height:36px;padding:0 16px;">+ Create new group</button>
+          <button class="btn-outline" style="font-size:14px;">Create multiple groups</button>
+        </div>
+      </div>
+      <div class="content-area" style="padding-top:8px;">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">User Groups can help you manage and organize users across your organization. Today, these groups can only be used for Clever IDM and Bulk Security Actions, but additional uses are coming soon.</p>
+        <div class="tab-bar" style="margin-bottom:16px;"><div class="tab active">Groups overview</div><div class="tab">Change log</div></div>
+        <input type="text" placeholder="Search by group name" style="height:36px;padding:0 12px;border:1px solid var(--border-input);border-radius:4px;font-family:var(--font);font-size:14px;width:240px;margin-bottom:16px;outline:none;" />
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Group name</th><th>Description</th><th>Members</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">All District Admins</a></td><td style="font-size:14px;color:var(--text-secondary);"></td><td><span style="background:var(--bg-secondary);border:1px solid var(--border-secondary);padding:2px 8px;border-radius:10px;font-size:13px;font-weight:600;">17</span></td><td><div style="display:flex;gap:6px;"><button class="action-btn" title="Copy"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button><button class="action-btn" title="Edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></div></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">All Staff</a></td><td style="font-size:14px;color:var(--text-secondary);"></td><td><span style="background:var(--bg-secondary);border:1px solid var(--border-secondary);padding:2px 8px;border-radius:10px;font-size:13px;font-weight:600;">15</span></td><td><div style="display:flex;gap:6px;"><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></div></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">All Students</a></td><td style="font-size:14px;color:var(--text-secondary);"></td><td><span style="background:var(--bg-secondary);border:1px solid var(--border-secondary);padding:2px 8px;border-radius:10px;font-size:13px;font-weight:600;">56,601</span></td><td><div style="display:flex;gap:6px;"><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></div></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">All Teachers</a></td><td style="font-size:14px;color:var(--text-secondary);"></td><td><span style="background:var(--bg-secondary);border:1px solid var(--border-secondary);padding:2px 8px;border-radius:10px;font-size:13px;font-weight:600;">8,410</span></td><td><div style="display:flex;gap:6px;"><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></div></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">Ridgemont school admins</a></td><td style="font-size:14px;color:var(--text-secondary);">Ridgemont High admin staff</td><td><span style="background:var(--bg-secondary);border:1px solid var(--border-secondary);padding:2px 8px;border-radius:10px;font-size:13px;font-weight:600;">4</span></td><td><div style="display:flex;gap:6px;"><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></div></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">Temporary staff</a></td><td style="font-size:14px;color:var(--text-secondary);">Contract / temporary employees</td><td><span style="background:var(--bg-secondary);border:1px solid var(--border-secondary);padding:2px 8px;border-radius:10px;font-size:13px;font-weight:600;">12</span></td><td><div style="display:flex;gap:6px;"><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button><button class="action-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></div></td></tr>
+            </tbody>
+          </table>
+          <div class="table-footer">
+            <select class="rows-select"><option>Show 25 rows</option></select>
+            <div class="pagination"><button class="pg-btn current">1</button><button class="pg-btn">2</button><button class="pg-btn">&rarr;</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ IDM ══ -->
+    <div class="screen" id="screen-idm">
+      <div class="page-header" style="padding-bottom:20px;">
+        <div class="page-title">Clever IDM</div>
+        <div class="page-actions">
+          <button class="btn-outline">Edit Active Directory provisioning</button>
+          <button class="btn-text-link" style="color:var(--brand-blue);font-size:14px;padding:0 8px;">Pause Active Directory sync</button>
+        </div>
+      </div>
+      <div class="content-area" style="padding-top:8px;">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">Destinations are services to which Clever can provision user accounts.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div style="border:2px solid var(--brand-blue);border-radius:8px;padding:20px;background:var(--bg-primary);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;background:#0078d4;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;">&#9633;</div><span style="font-size:14px;font-weight:600;">Microsoft Active Directory &#8211; Really AD</span></div>
+              <span class="status-badge status-active"><span class="status-dot"></span>Active</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;">
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Match</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Unmatch</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Update</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Issue</div><div style="font-size:22px;font-weight:700;">0</div></div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border-primary);border-radius:8px;padding:20px;background:var(--bg-primary);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;background:#fff;border:1px solid #dee0e5;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#ea4335;font-weight:700;">G</div><span style="font-size:14px;font-weight:600;">Google Workspace &#8211; Google playland</span></div>
+              <div style="display:flex;gap:6px;"><span class="status-badge status-active"><span class="status-dot"></span>Active</span><span style="background:#fff8e1;color:#b45309;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#9888; Issue</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;">
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Create</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Update</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Archive</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Issue</div><div style="font-size:22px;font-weight:700;color:#dc2626;">8,412</div></div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border-primary);border-radius:8px;padding:20px;background:var(--bg-primary);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;background:#0078d4;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;">M</div><span style="font-size:14px;font-weight:600;">Microsoft Entra ID</span></div>
+              <div style="display:flex;gap:6px;"><span class="status-badge status-active"><span class="status-dot"></span>Active</span><span style="background:#fff8e1;color:#b45309;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#9888; Issue</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;">
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Create</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Update</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Archive</div><div style="font-size:22px;font-weight:700;">0</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Issue</div><div style="font-size:22px;font-weight:700;color:#dc2626;">2</div></div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Your last Active Directory accounts sync was processed on 7/22/26, 1:15 AM</p>
+        <div class="tab-bar" style="margin-bottom:20px;"><div class="tab active">Tasks</div><div class="tab">Sync History</div><div class="tab">Exports</div><div class="tab">Events</div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;"><div style="font-size:16px;font-weight:600;">Notifications</div><a href="#" style="font-size:13px;color:var(--brand-blue);">&#8595; Download user accounts</a></div>
+        <div style="border:1px solid var(--border-primary);border-radius:8px;padding:28px;text-align:center;color:var(--text-secondary);font-size:14px;margin-bottom:16px;">You are all caught up!</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:12px;">Issues</div>
+        <div style="border:1px solid var(--border-primary);border-radius:8px;padding:28px;text-align:center;color:var(--text-secondary);font-size:14px;">You are all caught up!</div>
+      </div>
+    </div>
+
+    <!-- ══ ADMIN TEAM ══ -->
+    <div class="screen" id="screen-admin-team">
+      <div class="page-header" style="padding-bottom:20px;">
+        <div class="page-title">Team</div>
+        <div class="page-actions"><button class="btn-primary">Actions &#9660;</button></div>
+      </div>
+      <div class="content-area" style="padding-top:8px;">
+        <div style="background:var(--bg-secondary);border:1px solid var(--border-primary);border-radius:6px;padding:10px 16px;font-size:13px;color:var(--text-body);margin-bottom:16px;">&#9432; Clever requires Multi-Factor Authentication for all Clever Admin. <a href="#" style="color:var(--brand-blue);">Learn more about this feature here.</a></div>
+        <div class="tab-bar" style="margin-bottom:16px;"><div class="tab active">Members</div><div class="tab">Roles</div><div class="tab">Access control</div><div class="tab">Role settings</div></div>
+        <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:16px;">
+          <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">User Type</div><select class="form-select" style="width:150px;font-size:13px;height:32px;"><option>All types</option></select></div>
+          <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Role</div><select class="form-select" style="width:150px;font-size:13px;height:32px;"><option>All roles</option></select></div>
+          <input type="text" placeholder="Search" style="margin-left:auto;height:32px;padding:0 12px;border:1px solid var(--border-input);border-radius:4px;font-family:var(--font);font-size:13px;width:200px;outline:none;" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Roles</th><th>Title</th><th>MFA Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">Rachel Mitrano</a></td><td style="font-size:14px;">rachel.mitrano+hw@clever.com</td><td style="font-size:14px;">Clever Admin</td><td style="font-size:14px;">Chief Design Officer</td><td><span class="status-badge status-active" style="font-size:12px;"><span class="status-dot"></span>Activated MFA</span></td><td></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">Craig Hall</a></td><td style="font-size:14px;">craig.hall+email@clever.com</td><td style="font-size:14px;">Clever Admin</td><td style="font-size:14px;">Viscount</td><td><span class="status-badge status-active" style="font-size:12px;"><span class="status-dot"></span>Activated MFA</span></td><td><button class="btn-outline" style="font-size:12px;height:28px;padding:0 10px;">Actions &#9660;</button></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">Test Idmpermissions</a></td><td style="font-size:14px;">craig.hall+testidmperm@clever.com</td><td style="font-size:14px;">Just IDM permissions</td><td style="font-size:14px;">RBAC IDM tester</td><td><span style="background:#fff8e1;color:#b45309;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#9888; Unactivated MFA</span></td><td><button class="btn-outline" style="font-size:12px;height:28px;padding:0 10px;">Actions &#9660;</button></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">Mariana Hernandez</a></td><td style="font-size:14px;">mariana.hernandez+hwlodi@clever.com</td><td style="font-size:14px;">Lodi Test</td><td style="font-size:14px;">HiLodi Test</td><td><span style="background:#fff8e1;color:#b45309;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#9888; Unactivated MFA</span></td><td><button class="btn-outline" style="font-size:12px;height:28px;padding:0 10px;">Actions &#9660;</button></td></tr>
+              <tr><td><a href="#" style="color:var(--brand-blue);font-weight:500;text-decoration:none;">Craig Shall Test</a></td><td style="font-size:14px;">craigshalltest@gmail.com</td><td style="font-size:14px;">Clever Admin</td><td style="font-size:14px;">SSO Tester in Chief</td><td><span class="status-badge status-active" style="font-size:12px;"><span class="status-dot"></span>Activated MFA</span></td><td><button class="btn-outline" style="font-size:12px;height:28px;padding:0 10px;">Actions &#9660;</button></td></tr>
+            </tbody>
+          </table>
+          <div class="table-footer">
+            <select class="rows-select"><option>Show 25 rows</option></select>
+            <div class="pagination"><button class="pg-btn current">1</button><button class="pg-btn">2</button><button class="pg-btn">&rarr;</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LICENSE MANAGER ══ -->
+    <div class="screen" id="screen-license-manager">
+      <div class="page-header" style="padding-bottom:20px;"><div class="page-title">Google License Manager</div></div>
+      <div class="content-area" style="padding-top:0;max-width:820px;">
+        <div class="tab-bar" style="margin-bottom:24px;"><div class="tab active">Manager</div><div class="tab">Sync History</div></div>
+        <div style="font-size:18px;font-weight:600;color:var(--text-header);margin-bottom:4px;">Google Workspace for Education+</div>
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">Manages license access for users through OUs</p>
+        <div style="border:1px solid var(--border-primary);border-radius:8px;padding:20px;background:var(--bg-primary);margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-size:15px;font-weight:600;">Google connection</span><span class="status-badge status-active"><span class="status-dot"></span>Connected</span></div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">To manage your Google licenses, Clever needs permission to connect to your Google Workspace for Education+</p>
+          <a href="#" style="color:var(--brand-blue);font-size:13px;display:block;margin-bottom:10px;">Check the required permissions</a>
+          <button style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:14px;font-weight:600;padding:0;margin-bottom:14px;">Disconnect</button>
+          <div style="background:var(--bg-secondary);padding:12px;border-radius:6px;display:flex;align-items:flex-start;gap:8px;font-size:13px;"><input type="checkbox" checked style="margin-top:2px;"/><span>I have turned off automatic licensing for Google Workspace for Education in my Google Workspace. <a href="#" style="color:var(--brand-blue);">Learn more</a></span></div>
+        </div>
+        <div style="border:1px solid var(--border-primary);border-radius:8px;padding:20px;background:var(--bg-primary);margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px;"><p style="font-size:13px;color:var(--text-body);">Manage license rules below. When ready, preview or apply sync for all rules</p><span class="status-badge status-active"><span class="status-dot"></span>Active</span></div>
+          <div style="border:1px solid var(--border-secondary);border-radius:6px;padding:16px;margin-bottom:12px;">
+            <div style="font-size:14px;font-weight:600;margin-bottom:10px;">OUs for Google Workspace for Education Plus</div>
+            <div style="display:flex;gap:40px;font-size:13px;margin-bottom:10px;">
+              <div><div style="color:var(--text-secondary);margin-bottom:4px;">Selected OUs (1):</div><div>&#8226; /ssoto testing</div></div>
+              <div><div style="color:var(--text-secondary);margin-bottom:4px;">Remove Licenses for:</div><div>&lt;none&gt;</div></div>
+            </div>
+            <a href="#" style="color:var(--brand-blue);font-size:13px;font-weight:600;margin-right:12px;">Edit</a>
+            <a href="#" style="color:#dc2626;font-size:13px;font-weight:600;">Remove</a>
+          </div>
+          <button style="background:none;border:none;cursor:pointer;color:var(--brand-blue);font-size:14px;font-weight:600;padding:0;">+ Add rule</button>
+        </div>
+        <div style="border:1px solid var(--border-primary);border-radius:8px;padding:20px;background:var(--bg-primary);margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:15px;font-weight:600;">Assignment status</span><span style="background:#ecfdf5;color:#065f46;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#10003; Completed</span><span style="font-size:13px;color:var(--text-secondary);margin-left:auto;">Date: 07/22/2026, 2:31 AM</span></div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Clever will automatically sync your licenses nightly.</p>
+          <div style="border:1px solid var(--border-secondary);border-radius:6px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-size:14px;font-weight:600;">License Information</span><a href="#" style="color:var(--brand-blue);font-size:13px;">&#8595; Download</a></div>
+            <div style="font-size:13px;color:var(--text-secondary);">Total licenses: 0 | Total created: 0 | Total removed: 0 | Total issues: 1</div>
+            <div style="font-size:13px;font-weight:500;margin-top:4px;">Google Workspace for Education Plus: Licenses: 0 | Created: 0 | Removed: 0 | Issues: 1</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;"><button class="btn-outline">Preview</button><button class="btn-primary">Apply</button></div>
+      </div>
+    </div>
+
+    <!-- ══ BULK SECURITY ACTIONS ══ -->
+    <div class="screen" id="screen-bulk-security">
+      <div class="page-header" style="padding-bottom:20px;"><div class="page-title">Bulk security actions</div></div>
+      <div class="content-area" style="padding-top:8px;max-width:880px;">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">Take one or more actions on a group of users at once: <strong>reset passwords</strong>, or <strong>force reset on next login</strong>. <a href="#" style="color:var(--brand-blue);">Learn more about Bulk security actions.</a></p>
+        <div class="tab-bar" style="margin-bottom:24px;"><div class="tab active">Bulk security actions</div><div class="tab">Activity</div></div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:6px;">Select users</div>
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">Choose one or more user groups to perform a security action on</p>
+        <div style="border:1px solid var(--border-primary);border-radius:8px;overflow:hidden;background:var(--bg-primary);">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border-secondary);display:flex;align-items:center;justify-content:space-between;"><div style="display:flex;align-items:center;gap:12px;"><input type="checkbox" style="width:16px;height:16px;"/><span style="font-size:15px;font-weight:500;">Teachers</span></div><div style="background:#e8f5e9;color:#2e7d32;font-size:13px;font-weight:600;padding:4px 12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:6px;">0 teachers selected &#9660;</div></div>
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border-secondary);display:flex;align-items:center;justify-content:space-between;"><div style="display:flex;align-items:center;gap:12px;"><input type="checkbox" style="width:16px;height:16px;"/><span style="font-size:15px;font-weight:500;">Students</span></div><div style="background:#e8f5e9;color:#2e7d32;font-size:13px;font-weight:600;padding:4px 12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:6px;">0 students selected &#9660;</div></div>
+          <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;"><div style="display:flex;align-items:center;gap:12px;"><input type="checkbox" style="width:16px;height:16px;"/><span style="font-size:15px;font-weight:500;">Staff</span></div><div style="background:#e8f5e9;color:#2e7d32;font-size:13px;font-weight:600;padding:4px 12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:6px;">0 staff selected &#9660;</div></div>
+        </div>
+        <button style="margin-top:16px;background:#e8eaf0;color:var(--text-secondary);border:none;padding:10px 20px;border-radius:4px;font-family:var(--font);font-size:14px;font-weight:600;cursor:not-allowed;">Next step: Select security action(s)</button>
+      </div>
+    </div>
+
     <!-- ══ SCREEN: PLACEHOLDER ══ -->
     <div class="screen" id="screen-placeholder">
       <div class="content-area" style="padding-top:64px;">
@@ -992,22 +1217,127 @@
 </div>
 
 <script>
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
-    const target = document.getElementById('screen-' + id) || document.getElementById('screen-placeholder');
-    target.classList.add('visible');
-    document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
-    const subEl = document.getElementById('sub-' + id);
-    if (subEl) subEl.classList.add('active');
-    if (id === 'security-policies') renderSpTab('login');
-    if (id === 'authenticators') renderTrustList();
-    if (id === 'recovery') { renderClaimingList(); renderNotifList(); }
+
+  function renderBadgeManagement() {
+    const list = document.getElementById('sp-list');
+    const detail = document.getElementById('sp-detail');
+
+    // Hide list panel, use full width for badge content
+    list.style.display = 'none';
+    detail.style.padding = '0';
+    detail.style.background = 'var(--bg-secondary)';
+
+    const schools = [
+      { name: 'Alban Elementary School', downloaded: 99, newBadges: 95 },
+      { name: 'Alum Creek Elementary School', downloaded: 52, newBadges: 95 },
+      { name: 'Andrews Heights Elementary School', downloaded: 116, newBadges: 84 },
+      { name: 'Anne Bailey Elementary School', downloaded: 110, newBadges: 59 },
+      { name: 'Belle Elementary School', downloaded: 119, newBadges: 104 },
+      { name: 'Cedar Grove Elementary School', downloaded: 123, newBadges: 39 },
+      { name: 'Central Elementary School', downloaded: 177, newBadges: 83 },
+      { name: 'Chamberlain Elementary School', downloaded: 110, newBadges: 56 },
+      { name: 'Chesapeake Elementary School', downloaded: 162, newBadges: 46 },
+      { name: 'Clendenin Elementary School', downloaded: 226, newBadges: 82 },
+      { name: 'Cross Lanes Elementary School', downloaded: 192, newBadges: 41 },
+      { name: 'Dunbar Primary Center', downloaded: 130, newBadges: 45 },
+      { name: 'Flinn Elementary School', downloaded: 255, newBadges: 108 },
+      { name: 'Holz Elementary School', downloaded: 113, newBadges: 143 },
+    ];
+
+    const rows = schools.map(s => `
+      <tr>
+        <td style="padding:10px 16px;">
+          <input type="checkbox" checked style="width:14px;height:14px;margin-right:8px;"/>
+          <span style="font-size:14px;font-weight:500;color:var(--text-header);">${s.name}</span>
+        </td>
+        <td style="padding:10px 16px;font-size:14px;color:var(--text-body);">${s.downloaded}</td>
+        <td style="padding:10px 16px;font-size:14px;color:var(--text-body);">${s.newBadges}</td>
+        <td style="padding:10px 16px;">
+          <a href="#" style="color:var(--brand-blue);font-size:13px;font-weight:500;text-decoration:none;margin-right:8px;">&#8595; New</a>
+          <span style="color:var(--border-secondary);">|</span>
+          <a href="#" style="color:var(--brand-blue);font-size:13px;font-weight:500;text-decoration:none;margin-left:8px;">&#8595; All</a>
+        </td>
+        <td style="padding:10px 16px;">
+          <a href="#" style="color:#dc2626;font-size:13px;font-weight:600;text-decoration:none;">&#9888; Void</a>
+        </td>
+      </tr>`).join('');
+
+    detail.innerHTML = `
+      <div style="padding:24px 32px;background:var(--bg-primary);border-bottom:1px solid var(--border-primary);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+          <div>
+            <div style="font-size:20px;font-weight:600;color:var(--text-header);margin-bottom:4px;">Clever Badges</div>
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;"><strong style="color:var(--text-body);">Grades with badges:</strong> Infant/Toddler, Preschool, Pre Kindergarten, Kindergarten, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="btn-primary" style="font-size:14px;height:36px;padding:0 16px;" onclick="openBulkExpirationModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+              Set badge expiration
+            </button>
+            <button class="btn-outline" style="font-size:14px;height:36px;padding:0 16px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Download all badges &#9660;
+            </button>
+          </div>
+        </div>
+        <div class="tab-bar" style="border-bottom:none;margin-top:8px;">
+          <div class="tab active" style="padding:8px 16px 10px;font-size:14px;">Overview</div>
+          <div class="tab" style="padding:8px 16px 10px;font-size:14px;">Chromebook</div>
+          <div class="tab" style="padding:8px 16px 10px;font-size:14px;">Windows</div>
+          <div class="tab" style="padding:8px 16px 10px;font-size:14px;">Settings</div>
+          <div class="tab" style="padding:8px 16px 10px;font-size:14px;">Badges+</div>
+        </div>
+      </div>
+
+      <div style="padding:20px 32px;overflow-y:auto;flex:1;">
+        <div style="background:var(--brand-blue-light);border:1px solid #c7d9ff;border-radius:6px;padding:10px 16px;font-size:13px;color:var(--text-body);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--brand-blue)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          Learn about setting up Badges in our <a href="#" style="color:var(--brand-blue);font-weight:500;">Help Center.</a>
+        </div>
+
+        <div style="font-size:16px;font-weight:600;color:var(--text-header);margin-bottom:14px;">Downloaded Badges</div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+          <a href="#" style="color:var(--brand-blue);font-size:13px;font-weight:600;">7,256 New Badges</a>
+          <a href="#" style="color:var(--text-secondary);font-size:13px;font-weight:500;">All Badges</a>
+          <a href="#" style="color:#dc2626;font-size:13px;font-weight:600;">Void all Badges</a>
+          <span style="font-size:13px;color:var(--text-secondary);">61 of 61 schools selected</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="padding:10px 16px;font-size:13px;">
+                  <input type="checkbox" checked style="width:14px;height:14px;margin-right:8px;"/>
+                  School name
+                </th>
+                <th style="padding:10px 16px;font-size:13px;">Downloaded Badges</th>
+                <th style="padding:10px 16px;font-size:13px;">New Badges &#9432;</th>
+                <th style="padding:10px 16px;font-size:13px;">Download</th>
+                <th style="padding:10px 16px;font-size:13px;">Void Badges</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div class="table-footer">
+            <select class="rows-select"><option>Show 25 rows</option><option>Show 50 rows</option></select>
+            <div class="pagination">
+              <button class="pg-btn current">1</button>
+              <button class="pg-btn">2</button>
+              <button class="pg-btn">3</button>
+              <button class="pg-btn">&rarr;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
-  function navTo(id) {
-    showScreen('placeholder');
-    document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
-  }
+  // Also reset list panel when switching away from badge tab
+  const _origSwitchSpTab = switchSpTab;
+
+
 
   function toggleUM() {
     const sub = document.getElementById('um-sub');
@@ -1045,10 +1375,12 @@
 
   function renderTrustList() {
     const list = document.getElementById('trust-list');
-    const def = TRUST_DATA[0].id;
     if (!list) return;
-    list.innerHTML = '<div style="padding:8px 12px 4px;"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-secondary);">Conditions</span></div>' +
-      TRUST_DATA.map((p, i) => '<div class="sp-list-item ' + (p.id===def?'active':'') + '" id="tcitem-' + p.id + '" onclick="selectTrust(\'' + p.id + '\')"><span class="sp-item-num">' + (i+1) + '</span><span class="sp-item-name">' + p.name + '</span></div>').join('');
+    const def = TRUST_DATA[0].id;
+    list.innerHTML = '<div style="padding:8px 12px 4px;"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-secondary);">Conditions</span></div>'
+      + TRUST_DATA.map((p, i) => '<div class="sp-list-item ' + (p.id===def?'active':'') + '" id="tcitem-' + p.id + '" onclick="selectTrust(\'' + p.id + '\')">'
+        + '<span class="sp-item-num">' + (i+1) + '</span>'
+        + '<span class="sp-item-name">' + p.name + '</span></div>').join('');
     renderTrustDetail(def);
   }
 
@@ -1059,12 +1391,31 @@
   }
 
   function renderTrustDetail(id) {
-    const p = TRUST_DATA.find(x => x.id === id); if (!p) return;
+    const p = TRUST_DATA.find(x => x.id === id);
+    if (!p) return;
     const rows = p.attrs.filter(a => a.value).map(a => '<tr><td>' + a.label + '</td><td>' + a.value + '</td></tr>').join('');
     document.getElementById('trust-detail').innerHTML =
-      '<div class="sp-detail-header"><div class="sp-detail-title">' + p.name + '</div>' +
-      '<div class="sp-detail-actions"><button class="btn-outline danger">Delete</button><button class="btn-outline">Edit</button></div></div>' +
-      '<table class="attr-table"><thead><tr><th>Attribute</th><th>Configuration</th></tr></thead><tbody>' + rows + '</tbody></table>';
+      '<div class="sp-detail-header"><div class="sp-detail-title">' + p.name + '</div>'
+      + '<div class="sp-detail-actions"><button class="btn-outline danger">Delete</button><button class="btn-outline">Edit</button></div></div>'
+      + '<table class="attr-table"><thead><tr><th>Attribute</th><th>Configuration</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
+    const target = document.getElementById('screen-' + id) || document.getElementById('screen-placeholder');
+    target.classList.add('visible');
+    document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
+    const subEl = document.getElementById('sub-' + id);
+    if (subEl) subEl.classList.add('active');
+    if (id === 'security-policies') renderSpTab('login');
+    if (id === 'authenticators') renderTrustList();
+    if (id === 'recovery') { renderClaimingList(); renderNotifList(); }
+  }
+
+  function navTo(id) {
+    showScreen('placeholder');
+    document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
   }
 
   function toggleAuth() {
@@ -1199,7 +1550,13 @@
     ['login','password','badge'].forEach(t => {
       document.getElementById('sptab-' + t).classList.toggle('active', t === tab);
     });
-    renderSpTab(tab);
+    if (tab === 'badge') {
+      renderBadgeManagement();
+    } else {
+      document.getElementById('sp-list').style.display = '';
+      document.getElementById('sp-detail').style.padding = '32px 40px';
+      renderSpTab(tab);
+    }
   }
 
   function renderSpTab(tab) {
@@ -1490,5 +1847,250 @@
   // Init security policies on first nav
   document.addEventListener('DOMContentLoaded', () => { renderTrustList(); });
 </script>
+
+<!-- ══ SAML CONFIG MODAL ══ -->
+<div class="modal-overlay" id="saml-modal" onclick="handleSamlOverlay(event)">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeSamlModal()">&times;</button>
+    <div class="modal-heading">Configure SAML Authentication</div>
+
+    <div class="modal-step">Step 1: <a href="#">Configure your SAML identity provider to work with Clever.</a></div>
+
+    <div class="modal-step">Step 2: Enter a name for this SAML configuration</div>
+    <div class="form-field" style="margin-bottom:16px;">
+      <label class="form-label">SAML name</label>
+      <input class="form-input" type="text" placeholder="e.g. KIPP DC Active Directory" value="KIPP DC – Active Directory" />
+    </div>
+
+    <div class="modal-step">Step 3: Enter the URL for your metadata.xml file</div>
+    <div class="form-field" style="margin-bottom:6px;">
+      <label class="form-label">Metadata URL</label>
+      <input class="form-input" type="text" value="https://sso.kana.k12.wv.us/FederationMetadata/2007-06/FederationMetadata.xml" />
+    </div>
+    <a href="#" style="font-size:14px;color:var(--brand-blue);font-weight:500;display:block;margin-bottom:20px;">or upload metadata file instead (not recommended)</a>
+
+    <div class="modal-step">Step 4: Select your Identity Provider</div>
+    <div class="modal-idp-row">
+      <svg class="modal-idp-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <rect width="18" height="18" x="1" y="1" fill="#f25022"/><rect width="18" height="18" x="21" y="1" fill="#7fba00"/>
+        <rect width="18" height="18" x="1" y="21" fill="#00a4ef"/><rect width="18" height="18" x="21" y="21" fill="#ffb900"/>
+      </svg>
+      <select class="form-select" style="width:240px;">
+        <option>Active Directory</option>
+        <option>Azure AD</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <hr class="modal-divider" />
+
+    <label style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-body);cursor:pointer;">
+      <input type="checkbox" checked style="width:16px;height:16px;" />
+      Allow unencrypted SAML assertions (recommended)
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#8e93a6"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    </label>
+
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="closeSamlModal()">Save</button>
+      <button class="btn-text-link" onclick="closeSamlModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GENERIC AUTH EDIT MODAL ══ -->
+<div class="modal-overlay" id="generic-auth-modal" onclick="handleGenericAuthOverlay(event)">
+  <div class="modal-box" style="width:500px;">
+    <button class="modal-close-btn" onclick="closeGenericAuthModal()">&times;</button>
+    <div class="modal-heading" id="generic-auth-modal-title">Edit authenticator</div>
+
+    <!-- Deactivate section -->
+    <div class="deactivate-section">
+      <div class="deactivate-title">Deactivate</div>
+      <div class="deactivate-desc">Temporarily disable this authenticator. Users assigned to this method will fall back to any other configured authenticator. You can reactivate at any time.</div>
+      <button class="btn-outline" style="font-size:14px;" onclick="closeGenericAuthModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        Deactivate authenticator
+      </button>
+    </div>
+
+    <!-- Delete section -->
+    <div class="delete-section">
+      <div class="deactivate-title" style="color:#dc2626;margin-bottom:6px;">Delete permanently</div>
+      <div class="warning-box">
+        <div class="warning-box-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#dc2626"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          This action cannot be undone
+        </div>
+        <div class="warning-box-body">
+          Deleting this authenticator will:
+          <ul>
+            <li>Remove it from all security policies that reference it</li>
+            <li>Immediately prevent users from signing in with this method</li>
+            <li>Require affected users to use an alternative login method</li>
+          </ul>
+          Make sure another authenticator is available for affected users before deleting.
+        </div>
+      </div>
+      <button class="btn-outline danger" style="font-size:14px;" onclick="confirmDelete()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        Delete authenticator
+      </button>
+    </div>
+
+    <div class="modal-footer" style="margin-top:24px;border-top:1px solid var(--border-primary);padding-top:20px;">
+      <button class="btn-outline" onclick="closeGenericAuthModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="delete-confirm-modal" onclick="if(event.target===this)closeDeleteConfirm()">
+  <div class="modal-box" style="width:420px;">
+    <button class="modal-close-btn" onclick="closeDeleteConfirm()">&times;</button>
+    <div class="modal-heading" style="font-size:20px;">Are you sure?</div>
+    <p style="font-size:14px;color:var(--text-body);margin-bottom:20px;line-height:1.6;">
+      Type <strong id="delete-confirm-name-display"></strong> to confirm deletion.
+    </p>
+    <input class="form-input" type="text" id="delete-confirm-input" placeholder="Type authenticator name to confirm" style="margin-bottom:20px;" />
+    <div style="display:flex;gap:12px;">
+      <button class="btn-primary" style="background:#dc2626;" id="delete-confirm-btn" onclick="executeDelete()" disabled>Delete</button>
+      <button class="btn-outline" onclick="closeDeleteConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentAuthName = '';
+
+  function openSamlModal() {
+    document.getElementById('saml-modal').classList.add('open');
+  }
+  function closeSamlModal() {
+    document.getElementById('saml-modal').classList.remove('open');
+  }
+  function handleSamlOverlay(e) {
+    if (e.target === document.getElementById('saml-modal')) closeSamlModal();
+  }
+
+  function openGenericAuthModal(name) {
+    currentAuthName = name;
+    document.getElementById('generic-auth-modal-title').textContent = 'Edit: ' + name;
+    document.getElementById('generic-auth-modal').classList.add('open');
+  }
+  function closeGenericAuthModal() {
+    document.getElementById('generic-auth-modal').classList.remove('open');
+  }
+  function handleGenericAuthOverlay(e) {
+    if (e.target === document.getElementById('generic-auth-modal')) closeGenericAuthModal();
+  }
+
+  function confirmDelete() {
+    closeGenericAuthModal();
+    document.getElementById('delete-confirm-name-display').textContent = '"' + currentAuthName + '"';
+    document.getElementById('delete-confirm-input').value = '';
+    document.getElementById('delete-confirm-btn').disabled = true;
+    document.getElementById('delete-confirm-modal').classList.add('open');
+    document.getElementById('delete-confirm-input').addEventListener('input', function() {
+      document.getElementById('delete-confirm-btn').disabled = this.value !== currentAuthName;
+    });
+  }
+  function closeDeleteConfirm() {
+    document.getElementById('delete-confirm-modal').classList.remove('open');
+  }
+  function executeDelete() {
+    closeDeleteConfirm();
+    alert(currentAuthName + ' has been deleted.');
+  }
+</script>
+
+
+<!-- ══ PAUSE MODAL ══ -->
+<div class="modal-overlay" id="pause-modal" onclick="if(event.target===this)closePauseModal()">
+  <div class="modal-box" style="width:460px;">
+    <button class="modal-close-btn" onclick="closePauseModal()">&times;</button>
+    <div class="modal-heading" style="font-size:20px;" id="pause-modal-title">Pause authenticator</div>
+    <div class="warning-box" style="background:#fff8e1;border-color:#fcd34d;">
+      <div class="warning-box-title" style="color:#92400e;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#92400e"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        Users will be affected immediately
+      </div>
+      <div class="warning-box-body" style="color:#78350f;">
+        Pausing this authenticator will:
+        <ul>
+          <li>Prevent users from signing in with this method right away</li>
+          <li>Fall back to any other active authenticator assigned to those users</li>
+          <li>Remain paused until you manually reactivate it</li>
+        </ul>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">You can reactivate this authenticator at any time from the Authenticators page.</p>
+    <div style="display:flex;gap:12px;">
+      <button class="btn-primary" style="background:#d97706;" onclick="closePauseModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        Pause authenticator
+      </button>
+      <button class="btn-outline" onclick="closePauseModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openPauseModal(name) {
+    document.getElementById('pause-modal-title').textContent = 'Pause: ' + name;
+    document.getElementById('pause-modal').classList.add('open');
+  }
+  function closePauseModal() {
+    document.getElementById('pause-modal').classList.remove('open');
+  }
+</script>
+
+
+<!-- ══ BULK BADGE EXPIRATION MODAL ══ -->
+<div class="modal-overlay" id="badge-expiration-modal" onclick="if(event.target===this)closeBulkExpirationModal()">
+  <div class="modal-box" style="width:460px;">
+    <button class="modal-close-btn" onclick="closeBulkExpirationModal()">&times;</button>
+    <div class="modal-heading" style="font-size:20px;">Set bulk badge expiration</div>
+    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:24px;line-height:1.6;">
+      Set an expiration date for all currently active badges across your district. Badges will automatically become invalid after this date and users will need to download new ones.
+    </p>
+
+    <div class="form-field">
+      <label class="form-label">Expiration date</label>
+      <input class="form-input" type="date" id="badge-exp-date" value="2026-08-05" style="width:200px;" />
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">Badges will expire at midnight on this date.</div>
+    </div>
+
+    <div class="warning-box" style="background:#fff8e1;border-color:#fcd34d;margin-top:8px;">
+      <div class="warning-box-title" style="color:#92400e;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#92400e"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        This applies to all schools
+      </div>
+      <div class="warning-box-body" style="color:#78350f;">
+        All <strong>7,256 active badges</strong> across <strong>61 schools</strong> will expire on the date selected. This cannot be undone. Affected users will need to re-download their badges.
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:24px;">
+      <button class="btn-primary" onclick="saveBadgeExpiration()">Set expiration</button>
+      <button class="btn-outline" onclick="closeBulkExpirationModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openBulkExpirationModal() {
+    document.getElementById('badge-expiration-modal').classList.add('open');
+  }
+  function closeBulkExpirationModal() {
+    document.getElementById('badge-expiration-modal').classList.remove('open');
+  }
+  function saveBadgeExpiration() {
+    const d = document.getElementById('badge-exp-date').value;
+    const formatted = d ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'the selected date';
+    closeBulkExpirationModal();
+    alert('Badge expiration set to ' + formatted + ' for all 7,256 active badges.');
+  }
+</script>
+
 </body>
 </html>
