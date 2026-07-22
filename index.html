@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Clever District Admin – Prototype v4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Dewey tokens */
+  :root {
+    --navy: #0c1e57;
+    --navy-hover: #162a6e;
+    --nav-active-bg: #bfceff;
+    --nav-active-text: #13151a;
+    --nav-text: #ffffff;
+    --nav-sub-text: rgba(255,255,255,0.85);
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f7fa;
+    --bg-container: #f5f7fa;
+    --border-primary: #e8eaf0;
+    --border-secondary: #dee0e5;
+    --border-input: #8e93a6;
+    --text-header: #13151a;
+    --text-body: #3c404f;
+    --text-secondary: #6b7280;
+    --brand-blue: #1464ff;
+    --brand-blue-light: #f0f7ff;
+    --status-active: #12b76a;
+    --status-active-bg: #ecfdf5;
+    --status-inactive-bg: #f5f7fa;
+    --status-inactive: #6b7280;
+    --status-future-bg: #fff8e1;
+    --status-future: #b45309;
+    --font: 'Inter', 'Proxima Nova', -apple-system, sans-serif;
+    --nav-width: 216px;
+    --header-h: 72px;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg-secondary);
+    color: var(--text-body);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    height: var(--header-h);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px 0 0;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: var(--nav-width);
+    background: var(--navy);
+    height: 100%;
+    padding: 0 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .topbar-logo { color: #fff; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; line-height: 1; }
+  .topbar-district { color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+  .topbar-right { display: flex; align-items: center; gap: 24px; }
+  .topbar-search {
+    width: 400px; height: 40px;
+    border: 1px solid var(--border-input);
+    border-radius: 4px;
+    padding: 0 12px 0 36px;
+    font-family: var(--font); font-size: 14px; color: var(--text-body);
+    background: var(--bg-primary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238e93a6' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") no-repeat 10px center;
+    outline: none;
+  }
+  .topbar-search:focus { border-color: var(--brand-blue); }
+  .topbar-user { font-size: 14px; font-weight: 600; color: var(--text-body); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+  .topbar-portal { font-size: 14px; font-weight: 600; color: var(--brand-blue); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+  /* ── SHELL ── */
+  .shell { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── LEFT NAV ── */
+  .nav {
+    width: var(--nav-width);
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 8px 0 16px;
+  }
+  .nav::-webkit-scrollbar { width: 4px; }
+  .nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+  .nav-divider { height: 1px; background: rgba(255,255,255,0.12); margin: 8px 0; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 7px 15px;
+    margin: 2px 8px;
+    border-radius: 4px;
+    font-size: 14px; font-weight: 600; color: var(--nav-text);
+    cursor: pointer; user-select: none;
+    justify-content: space-between;
+    transition: background 0.12s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.08); }
+  .nav-item.active-parent { background: rgba(255,255,255,0.06); }
+
+  .nav-item-inner { display: flex; align-items: center; gap: 12px; flex: 1; }
+  .nav-icon { width: 20px; height: 20px; flex-shrink: 0; opacity: 0.85; }
+  .nav-chevron { width: 16px; height: 16px; opacity: 0.6; transition: transform 0.2s; }
+  .nav-chevron.open { transform: rotate(180deg); }
+
+  .nav-sub { overflow: hidden; }
+  .nav-sub-item {
+    display: flex; align-items: center;
+    padding: 7px 7px 7px 43px;
+    margin: 1px 8px;
+    border-radius: 4px;
+    font-size: 14px; font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer; user-select: none;
+    transition: background 0.12s;
+  }
+  .nav-sub-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-sub-item.active {
+    background: var(--nav-active-bg);
+    color: var(--nav-active-text);
+  }
+
+  .nav-footer {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .page-header {
+    background: var(--bg-secondary);
+    padding: 24px 64px 0;
+    flex-shrink: 0;
+  }
+  .page-title {
+    font-size: 28px; font-weight: 600; color: var(--text-header);
+    letter-spacing: -0.2px; line-height: 1.28;
+    margin-bottom: 16px;
+  }
+  .page-actions { display: flex; gap: 8px; margin-bottom: 20px; }
+
+  .btn-primary {
+    height: 40px; padding: 0 24px;
+    background: var(--brand-blue); color: #fff;
+    border: none; border-radius: 4px;
+    font-family: var(--font); font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    transition: background 0.12s;
+  }
+  .btn-primary:hover { background: #0f55e0; }
+
+  /* ── TABS (other screens only) ── */
+  .tab-bar {
+    display: flex; gap: 0;
+    border-bottom: 2px solid var(--border-primary);
+  }
+  .tab {
+    padding: 10px 20px 12px;
+    font-size: 15px; font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -2px; user-select: none;
+    transition: color 0.12s;
+  }
+  .tab:hover { color: var(--text-header); }
+  .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
+
+  /* ── CONTENT AREA ── */
+  .content-area {
+    flex: 1; overflow-y: auto;
+    padding: 24px 64px;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    border: 2px solid var(--border-primary);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-primary);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--bg-secondary); }
+  thead th {
+    padding: 12px 24px;
+    text-align: left;
+    font-size: 16px; font-weight: 600; color: var(--text-header);
+    border-top: 1px solid var(--border-secondary);
+    white-space: nowrap;
+  }
+  thead th:first-child { border-top: none; }
+  .sort-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: 600; color: var(--text-header); padding: 0; }
+  .sort-icon { width: 16px; height: 16px; color: var(--text-secondary); }
+
+  tbody tr {
+    border-top: 1px solid var(--border-secondary);
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: var(--bg-secondary); }
+  td { padding: 12px 24px; font-size: 16px; color: var(--text-body); }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600; padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .status-active { background: var(--status-active-bg); color: #065f46; }
+  .status-inactive { background: var(--status-inactive-bg); color: var(--status-inactive); }
+  .status-future { background: var(--status-future-bg); color: var(--status-future); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .action-btn {
+    background: none; border: none; cursor: pointer;
+    padding: 4px; border-radius: 4px; color: var(--brand-blue);
+    display: flex; align-items: center;
+    transition: background 0.12s;
+  }
+  .action-btn:hover { background: var(--brand-blue-light); }
+
+  /* method type tag */
+  .method-tag {
+    font-size: 12px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; display: inline-block;
+  }
+  .tag-first { background: #ede9fe; color: #5b21b6; }
+  .tag-second { background: #e0f2fe; color: #075985; }
+  .tag-mfa { background: #fef3c7; color: #92400e; }
+  .tag-both { background: #ecfdf5; color: #065f46; }
+
+  .auth-name { font-weight: 500; color: var(--text-header); }
+  .auth-desc { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* empty state */
+  .empty-state {
+    padding: 64px 24px; text-align: center;
+    color: var(--text-secondary);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+  .empty-title { font-size: 16px; font-weight: 600; color: var(--text-header); margin-bottom: 6px; }
+  .empty-body { font-size: 14px; margin-bottom: 20px; }
+
+  /* table footer */
+  .table-footer {
+    padding: 12px 24px;
+    border-top: 1px solid var(--border-secondary);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg-primary);
+  }
+  .rows-select {
+    border: 1px solid var(--border-input); border-radius: 4px;
+    padding: 6px 32px 6px 12px; font-family: var(--font); font-size: 14px;
+    color: var(--text-body); background: var(--bg-primary);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238e93a6' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center;
+    cursor: pointer;
+  }
+  .pagination { display: flex; align-items: center; gap: 4px; }
+  .pg-btn {
+    min-width: 32px; height: 32px; padding: 0 8px;
+    border: 1px solid transparent; border-radius: 4px;
+    background: none; font-family: var(--font); font-size: 13px; font-weight: 600;
+    color: var(--brand-blue); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s;
+  }
+  .pg-btn:hover { background: var(--brand-blue-light); }
+  .pg-btn.current { background: var(--brand-blue-light); border-color: var(--brand-blue); }
+
+  /* ── ACCOUNT ACCESS ── */
+  .aa-section-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 16px; gap: 16px;
+  }
+  .aa-section-title { font-size: 18px; font-weight: 600; color: var(--text-header); margin-bottom: 4px; }
+  .aa-section-desc { font-size: 14px; color: var(--text-secondary); max-width: 760px; line-height: 1.5; }
+  .info-banner {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--brand-blue-light); border: 1px solid #c7d9ff;
+    border-radius: 6px; padding: 10px 16px;
+    font-size: 14px; color: var(--text-body);
+    margin-bottom: 16px;
+  }
+  .link { color: var(--brand-blue); text-decoration: none; font-weight: 500; }
+  .link:hover { text-decoration: underline; }
+  .aa-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .aa-toggle-row { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--text-header); }
+  .toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: #dee0e5; border-radius: 22px; transition: .2s;
+  }
+  .toggle-slider:before {
+    position: absolute; content: ""; height: 16px; width: 16px;
+    left: 3px; bottom: 3px;
+    background: white; border-radius: 50%; transition: .2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--status-active); }
+  .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
+  .text-secondary { color: var(--text-secondary); font-size: 14px; }
+  .btn-text-link {
+    background: none; border: none; cursor: pointer;
+    color: var(--brand-blue); font-family: var(--font); font-size: 14px; font-weight: 600;
+    padding: 0; text-decoration: none;
+  }
+  .btn-text-link:hover { text-decoration: underline; }
+  .dest-icons { display: flex; align-items: center; gap: 4px; }
+  .dest-icon {
+    width: 24px; height: 24px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .dest-clever { background: #1464ff; color: white; }
+  .dest-google { background: #fff; border: 1px solid #dee0e5; color: #ea4335; font-size: 13px; font-weight: 700; }
+  .dest-windows { background: #0078d4; color: white; font-size: 12px; }
+  .dest-arrow { background: var(--bg-secondary); color: var(--text-secondary); font-size: 14px; }
+  .security-field-block { margin-bottom: 8px; }
+  .reset-card {
+    background: var(--bg-primary); border: 1px solid var(--border-primary);
+    border-radius: 8px; padding: 20px 24px;
+  }
+  .reset-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .reset-card-title { font-size: 16px; font-weight: 600; color: var(--text-header); }
+  .reset-card-body { font-size: 14px; color: var(--text-body); margin-bottom: 8px; }
+  .reset-card-meta { font-size: 13px; color: var(--text-secondary); }
+
+  /* wizard */
+  .wizard-step {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;
+  }
+  .wizard-step.active { color: var(--text-header); font-weight: 600; }
+  .wizard-step.completed { color: var(--status-active); }
+  .wizard-step-num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--brand-blue); color: white;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .email-preview { background: var(--bg-secondary); border-radius: 8px; padding: 16px; }
+  .email-mock { background: white; border: 1px solid var(--border-primary); border-radius: 6px; overflow: hidden; margin-top: 12px; }
+  .email-mock-header { background: var(--brand-blue); color: white; font-size: 20px; font-weight: 700; text-align: center; padding: 20px; }
+  .email-mock-body { padding: 20px; font-size: 14px; line-height: 1.6; }
+  .radio-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-body); margin-bottom: 6px; cursor: pointer; }
+
+  /* ── SCREEN MANAGEMENT ── */
+  .screen { display: none; }
+  .screen.visible { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+  /* ── MASTER-DETAIL (Security Policies) ── */
+  .sp-body {
+    display: flex; flex: 1; overflow: hidden;
+    border-top: 1px solid var(--border-primary);
+  }
+  .sp-list {
+    width: 260px; flex-shrink: 0;
+    border-right: 1px solid var(--border-primary);
+    overflow-y: auto;
+    padding: 12px 8px;
+    background: var(--bg-primary);
+  }
+  .sp-list-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer; user-select: none;
+    transition: background 0.1s;
+  }
+  .sp-list-item:hover { background: var(--bg-secondary); }
+  .sp-list-item.active { background: var(--brand-blue-light); border: 1px solid #c7d9ff; }
+  .sp-list-item.active .sp-item-name { color: var(--brand-blue); }
+  .sp-item-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--bg-secondary); color: var(--text-secondary);
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .sp-list-item.active .sp-item-num { background: var(--brand-blue); color: #fff; }
+  .sp-drag { color: var(--border-secondary); flex-shrink: 0; cursor: grab; }
+  .sp-item-name { font-size: 14px; font-weight: 500; color: var(--text-header); flex: 1; }
+
+  .sp-detail {
+    flex: 1; overflow-y: auto;
+    padding: 32px 40px;
+    background: var(--bg-secondary);
+  }
+  .sp-detail-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .sp-detail-title { font-size: 20px; font-weight: 600; color: var(--text-header); }
+  .sp-detail-actions { display: flex; gap: 8px; }
+
+  .btn-outline {
+    height: 36px; padding: 0 16px;
+    border: 1px solid var(--border-input); border-radius: 4px;
+    background: var(--bg-primary); color: var(--text-body);
+    font-family: var(--font); font-size: 14px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: border-color 0.12s;
+  }
+  .btn-outline:hover { border-color: var(--brand-blue); color: var(--brand-blue); }
+  .btn-outline.danger { border-color: #fca5a5; color: #dc2626; }
+  .btn-outline.danger:hover { background: #fef2f2; }
+
+  /* attribute table (Image 3 style) */
+  .attr-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px; overflow: hidden;
+  }
+  .attr-table thead tr { background: var(--bg-secondary); }
+  .attr-table thead th {
+    padding: 12px 20px; text-align: left;
+    font-size: 14px; font-weight: 600; color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-primary);
+  }
+  .attr-table tbody tr { border-top: 1px solid var(--border-primary); }
+  .attr-table tbody tr:first-child { border-top: none; }
+  .attr-table td {
+    padding: 14px 20px; font-size: 14px;
+    vertical-align: top;
+  }
+  .attr-table td:first-child { color: var(--text-secondary); width: 200px; font-weight: 500; white-space: nowrap; }
+  .attr-table td:last-child { color: var(--text-header); font-weight: 600; }
+
+  /* ── DRAWER OVERLAY ── */
+  .drawer-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.3); z-index: 100;
+  }
+  .drawer-overlay.open { display: block; }
+  .drawer {
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 480px; background: var(--bg-primary);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.2s ease;
+  }
+  .drawer-overlay.open .drawer { transform: translateX(0); }
+  .drawer-header {
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid var(--border-primary);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .drawer-title { font-size: 20px; font-weight: 600; color: var(--text-header); }
+  .drawer-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-secondary); padding: 4px; border-radius: 4px;
+  }
+  .drawer-close:hover { background: var(--bg-secondary); }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
+  .drawer-footer {
+    padding: 16px 24px; border-top: 1px solid var(--border-primary);
+    display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0;
+  }
+  .form-field { margin-bottom: 20px; }
+  .form-label { font-size: 13px; font-weight: 600; color: var(--text-header); margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%; height: 40px; padding: 0 12px;
+    border: 1px solid var(--border-input); border-radius: 4px;
+    font-family: var(--font); font-size: 14px; color: var(--text-body);
+    background: var(--bg-primary);
+  }
+  .form-input:focus { outline: none; border-color: var(--brand-blue); }
+  .form-textarea {
+    width: 100%; padding: 10px 12px; min-height: 80px;
+    border: 1px solid var(--border-input); border-radius: 4px;
+    font-family: var(--font); font-size: 14px; color: var(--text-body);
+    background: var(--bg-primary); resize: vertical;
+  }
+  .form-select {
+    width: 100%; height: 40px; padding: 0 12px;
+    border: 1px solid var(--border-input); border-radius: 4px;
+    font-family: var(--font); font-size: 14px; color: var(--text-body);
+    background: var(--bg-primary); appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238e93a6' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  .form-divider { border: none; border-top: 1px solid var(--border-primary); margin: 24px 0; }
+
+  /* nav item label-only */
+  .nav-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.4); padding: 12px 16px 4px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">Clever</div>
+    <div class="topbar-district">KIPP DC</div>
+  </div>
+  <input class="topbar-search" type="text" placeholder="Search for users or applications" />
+  <div class="topbar-right">
+    <div class="topbar-portal">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#1464ff"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+      Portal
+    </div>
+    <div class="topbar-user">
+      Dewey Fox
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#3c404f"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+
+  <!-- LEFT NAV -->
+  <nav class="nav">
+    <div class="nav-item" onclick="navTo('dashboard')">
+      <div class="nav-item-inner">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        Dashboard home
+      </div>
+    </div>
+    <div class="nav-item" onclick="navTo('applications')">
+      <div class="nav-item-inner">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+        Applications
+      </div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="nav-item" onclick="navTo('data-sources')">
+      <div class="nav-item-inner">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.54 15.97 1 13.59 1c-1.27 0-2.41.5-3.26 1.3L9 3.57 7.67 2.3C6.82 1.5 5.68 1 4.41 1 2.03 1 0 2.54 0 4.64c0 .48.11.92.18 1.36H0v2h20V6z"/><path d="M0 20c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8H0v12z"/></svg>
+        Data sources
+      </div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-item" id="um-parent" onclick="toggleUM()">
+      <div class="nav-item-inner">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        User management
+      </div>
+      <svg class="nav-chevron" id="um-chevron" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="nav-sub" id="um-sub" style="display:none;">
+      <div class="nav-sub-item" onclick="navTo('placeholder')">User groups</div>
+      <div class="nav-sub-item" onclick="navTo('placeholder')">IDM</div>
+      <div class="nav-sub-item" onclick="navTo('placeholder')">Admin team</div>
+      <div class="nav-sub-item" onclick="navTo('placeholder')">License manager</div>
+    </div>
+
+    <!-- Authentication (expanded, active) -->
+    <div class="nav-item active-parent" onclick="toggleAuth()">
+      <div class="nav-item-inner">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        Authentication
+      </div>
+      <svg class="nav-chevron open" id="auth-chevron" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="nav-sub" id="auth-sub">
+      <div class="nav-sub-item active" id="sub-authenticators" onclick="showScreen('authenticators')">Authenticators</div>
+      <div class="nav-sub-item" id="sub-security-policies" onclick="showScreen('security-policies')">Security policies</div>
+      <div class="nav-sub-item" id="sub-devices" onclick="showScreen('devices')">Devices</div>
+      <div class="nav-sub-item" id="sub-customize" onclick="showScreen('customize')">Customize login</div>
+      <div class="nav-sub-item" id="sub-logs" onclick="showScreen('logs')">Access logs</div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-item" onclick="navTo('portal')">
+      <div class="nav-item-inner">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></svg>
+        Portal
+      </div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+    <div class="nav-item">
+      <div class="nav-item-inner">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="rgba(255,255,255,0.85)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+        Support tools
+      </div>
+      <svg class="nav-chevron" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+
+    <div class="nav-footer">
+      <div class="nav-item">
+        <div class="nav-item-inner">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="rgba(255,255,255,0.6)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Training &amp; support
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══ SCREEN: AUTHENTICATORS ══ -->
+    <div class="screen visible" id="screen-authenticators">
+      <div class="page-header">
+        <div class="page-title">Authenticators</div>
+        <div class="page-actions">
+          <button class="btn-primary">
+            Add authenticator
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+          </button>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab active" id="authtab-list" onclick="switchAuthTab('list')">All authenticators</div>
+          <div class="tab" id="authtab-trust" onclick="switchAuthTab('trust')">Trust conditions</div>
+        </div>
+      </div>
+
+      <div id="authcontent-list" class="content-area">
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><button class="sort-btn">Authenticator <svg class="sort-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg></button></th>
+                <th><button class="sort-btn">Status <svg class="sort-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg></button></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="auth-name">Clever Passwords</div><div class="auth-desc">Username + password login via Clever</div></td>
+                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
+                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="auth-name">Google IdP</div><div class="auth-desc">Sign in with Google account</div></td>
+                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
+                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+              </tr>
+
+
+
+
+              <tr>
+                <td><div class="auth-name">Badges</div><div class="auth-desc">Physical or digital badge scan (Chrome, Windows, Badges+)</div></td>
+                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
+                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="auth-name">PIN</div><div class="auth-desc">Numeric PIN for MFA step-up</div></td>
+                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
+                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+              </tr>
+              <tr>
+                <td><div class="auth-name">Pictures</div><div class="auth-desc">Image-based authentication for younger students</div></td>
+                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
+                <td><button class="action-btn" title="Edit"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></td>
+              </tr>
+
+
+            </tbody>
+          </table>
+          <div class="table-footer">
+            <select class="rows-select"><option>Show 25 rows</option><option>Show 50 rows</option></select>
+            <div class="pagination"><button class="pg-btn current">1</button></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TRUST CONDITIONS TAB -->
+      <div id="authcontent-trust" style="display:none;flex:1;overflow:hidden;border-top:1px solid var(--border-primary);">
+        <div class="sp-list" id="trust-list"></div>
+        <div class="sp-detail" id="trust-detail"></div>
+      </div>
+
+    </div><!-- /screen-authenticators -->
+
+    <!-- ══ SCREEN: SECURITY POLICIES ══ -->
+    <div class="screen" id="screen-security-policies">
+      <div class="page-header">
+        <div class="page-title">Security policies</div>
+        <div class="page-actions">
+          <button class="btn-primary" onclick="openPolicyDrawer()">
+            Add policy
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </button>
+        </div>
+        <div class="tab-bar">
+          <div class="tab active" id="sptab-login" onclick="switchSpTab('login')">Login policy</div>
+          <div class="tab" id="sptab-password" onclick="switchSpTab('password')">Password policy</div>
+          <div class="tab" id="sptab-badge" onclick="switchSpTab('badge')">Badge management</div>
+
+        </div>
+      </div>
+
+      <!-- MASTER-DETAIL BODY -->
+      <div class="sp-body">
+
+        <!-- LEFT: POLICY LIST -->
+        <div class="sp-list" id="sp-list">
+          <!-- populated by JS -->
+        </div>
+
+        <!-- RIGHT: DETAIL PANEL -->
+        <div class="sp-detail" id="sp-detail">
+          <!-- populated by JS -->
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: DEVICES ══ -->
+    <div class="screen" id="screen-devices">
+      <div class="page-header">
+        <div class="page-title">Devices</div>
+        <div class="page-actions"><button class="btn-primary">Add device config <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button></div>
+        <div class="tab-bar">
+          <div class="tab active">Device login methods</div>
+          <div class="tab">Device trust</div>
+          <div class="tab">Device policies</div>
+        </div>
+      </div>
+      <div class="content-area">
+        <div class="empty-state"><div class="empty-icon">💻</div><div class="empty-title">Device configuration</div><div class="empty-body">Configure how Chromebooks, Windows, iOS, and Mac devices authenticate.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: ACCOUNT ACCESS ══ -->
+    <div class="screen" id="screen-recovery">
+      <div class="page-header">
+        <div class="page-title">Account access</div>
+        <div class="page-actions" id="aa-page-actions">
+          <button class="btn-primary" onclick="openAaAddDrawer()">
+            Add group
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </button>
+        </div>
+        <div class="tab-bar">
+          <div class="tab active" id="aatab-claiming" onclick="switchAaTab('claiming')">Account claiming</div>
+          <div class="tab" id="aatab-notifications" onclick="switchAaTab('notifications')">Account notifications</div>
+          <div class="tab" id="aatab-reset" onclick="switchAaTab('reset')">Password reset</div>
+        </div>
+      </div>
+
+      <!-- ACCOUNT CLAIMING: master-detail -->
+      <div class="sp-body" id="aacontent-claiming">
+        <div class="sp-list" id="aa-claiming-list"></div>
+        <div class="sp-detail" id="aa-claiming-detail"></div>
+      </div>
+
+      <!-- ACCOUNT NOTIFICATIONS: master-detail -->
+      <div class="sp-body" id="aacontent-notifications" style="display:none;">
+        <div class="sp-list" id="aa-notif-list"></div>
+        <div class="sp-detail" id="aa-notif-detail"></div>
+      </div>
+
+      <!-- PASSWORD RESET (scrollable, not master-detail) -->
+      <div class="content-area" id="aacontent-reset" style="display:none;">
+          <div class="aa-section-header">
+            <div>
+              <div class="aa-section-title">Password Reset</div>
+              <div class="aa-section-desc">Configure which identity providers allow self-service password reset, and which user groups are in scope.</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-text-link">Edit settings</button>
+              <button class="btn-text-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Bulk reset passwords
+              </button>
+            </div>
+          </div>
+
+          <div class="reset-card">
+            <div class="reset-card-header">
+              <span class="status-badge status-active"><span class="status-dot"></span>Enabled</span>
+              <div class="reset-card-title">Clever Passwords</div>
+            </div>
+            <div class="reset-card-body">Clever password users can reset their passwords.</div>
+            <div class="reset-card-meta">User types <strong>students, teachers, staff</strong></div>
+          </div>
+
+          <div class="reset-card" style="margin-top:12px;">
+            <div class="reset-card-header">
+              <span class="status-badge status-active"><span class="status-dot"></span>Enabled</span>
+              <div class="reset-card-title">External Identity Providers (IdPs)</div>
+            </div>
+            <div class="reset-card-body">Users can reset their passwords to Active Directory and Google Workspace.</div>
+            <div style="margin:8px 0;">
+              <span style="background:#ede9fe;color:#5b21b6;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">Powered by IDM</span>
+            </div>
+            <div class="reset-card-meta">User types <strong>students, teachers, staff</strong></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ACCOUNT CLAIMING SETUP DRAWER -->
+    <div class="drawer-overlay" id="claiming-drawer-overlay" onclick="handleClaimingOverlayClick(event)">
+      <div class="drawer">
+        <div class="drawer-header">
+          <div class="drawer-title" id="claiming-drawer-title">Students Account Claiming Setup</div>
+          <button class="drawer-close" onclick="closeClaimingDrawer()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
+        <div class="drawer-body">
+          <p style="font-size:14px;color:var(--text-secondary);margin-bottom:24px;">At least 2 security fields are required to enable account claiming.</p>
+
+          <div class="form-field">
+            <label class="form-label" style="font-weight:700;">Which questions should we display?</label>
+          </div>
+
+          <div class="security-field-block">
+            <div class="form-field">
+              <label class="form-label">Primary security field</label>
+              <select class="form-select"><option>Email address</option><option>SIS ID</option><option>Date of birth</option><option>Staff ID</option></select>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">This field should be the most unique identifier</div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Question displayed</label>
+              <input class="form-input" type="text" value="What is your email address?" />
+            </div>
+            <div class="form-field">
+              <label class="form-label" style="display:flex;justify-content:space-between;"><span>Hint</span><span style="font-weight:400;color:var(--text-secondary);">Optional</span></label>
+              <input class="form-input" type="text" placeholder="Provide instructions to help users find the selected information" />
+            </div>
+          </div>
+
+          <hr class="form-divider" />
+
+          <div class="security-field-block">
+            <div class="form-field">
+              <label class="form-label">Secondary security field</label>
+              <select class="form-select"><option>SIS ID</option><option>Email address</option><option>Date of birth</option></select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Question displayed</label>
+              <input class="form-input" type="text" value="What is your student id?" />
+            </div>
+            <div class="form-field">
+              <label class="form-label" style="display:flex;justify-content:space-between;"><span>Hint</span><span style="font-weight:400;color:var(--text-secondary);">Optional</span></label>
+              <input class="form-input" type="text" placeholder="Provide instructions to help users find the selected information" />
+            </div>
+          </div>
+
+          <hr class="form-divider" />
+
+          <div class="security-field-block">
+            <div class="form-field" style="display:flex;align-items:flex-end;gap:8px;">
+              <div style="flex:1;">
+                <label class="form-label">Additional security field</label>
+                <select class="form-select"><option>Date of birth</option><option>Email address</option><option>SIS ID</option></select>
+              </div>
+              <button class="action-btn" style="margin-bottom:2px;" title="Remove field">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#6b7280"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              </button>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Question displayed</label>
+              <input class="form-input" type="text" value="What is your date of birth?" />
+            </div>
+            <div class="form-field">
+              <label class="form-label" style="display:flex;justify-content:space-between;"><span>Hint</span><span style="font-weight:400;color:var(--text-secondary);">Optional</span></label>
+              <input class="form-input" type="text" placeholder="Provide instructions to help users find the selected information" />
+            </div>
+          </div>
+        </div>
+        <div class="drawer-footer">
+          <button class="btn-outline" onclick="closeClaimingDrawer()">Cancel</button>
+          <button class="btn-primary" onclick="closeClaimingDrawer()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT NOTIFICATIONS WIZARD -->
+    <div class="drawer-overlay" id="notif-wizard-overlay" onclick="handleNotifOverlayClick(event)">
+      <div class="drawer" style="width:560px;">
+        <div class="drawer-header">
+          <div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:2px;">Account Notifications Configuration</div>
+            <div class="drawer-title" id="notif-wizard-title">Students</div>
+          </div>
+          <button class="drawer-close" onclick="closeNotifWizard()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>
+        </div>
+        <div class="drawer-body" style="display:flex;gap:0;padding:0;">
+          <!-- wizard steps sidebar -->
+          <div style="width:180px;flex-shrink:0;border-right:1px solid var(--border-primary);padding:24px 16px;">
+            <div class="wizard-step completed"><svg width="14" height="14" viewBox="0 0 24 24" fill="#12b76a"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Configure email notifications</div>
+            <div class="wizard-step completed"><svg width="14" height="14" viewBox="0 0 24 24" fill="#12b76a"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Select destinations</div>
+            <div class="wizard-step completed"><svg width="14" height="14" viewBox="0 0 24 24" fill="#12b76a"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Select email field</div>
+            <div class="wizard-step active"><span class="wizard-step-num">4</span> Customize email template…</div>
+          </div>
+          <!-- wizard content -->
+          <div style="flex:1;padding:24px;overflow-y:auto;">
+            <div style="font-size:18px;font-weight:600;color:var(--text-header);margin-bottom:6px;">Customize email template</div>
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">Optional — customize the subject, header and body to fit your school's branding, or use the defaults.</div>
+
+            <div class="email-preview">
+              <div class="form-field">
+                <label class="form-label">Subject</label>
+                <input class="form-input" type="text" value="Your Clever account has been created!" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">Choose email header</label>
+                <label class="radio-row"><input type="radio" name="header" checked /> Use Clever default header</label>
+                <label class="radio-row"><input type="radio" name="header" /> Use same icon as Portal/Login screen</label>
+              </div>
+              <div class="email-mock">
+                <div class="email-mock-header">Clever</div>
+                <div class="email-mock-body">
+                  <div style="font-weight:700;margin-bottom:8px;">Your Clever account has been created!</div>
+                  <div style="font-size:13px;color:var(--text-body);line-height:1.6;">
+                    Hi {student.name},<br/><br/>
+                    Welcome to <a href="#" class="link">Clever</a>! {district_name} has added you to their Clever account.<br/><br/>
+                    Your username is <strong>{student.email}</strong><br/><br/>
+                    If you have trouble logging in, please contact someone at your school to help.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="drawer-footer">
+          <button class="btn-outline" onclick="closeNotifWizard()">Cancel</button>
+          <button class="btn-primary" onclick="closeNotifWizard()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: CUSTOMIZE LOGIN ══ -->
+    <div class="screen" id="screen-customize">
+      <div class="page-header">
+        <div class="page-title">Customize login</div>
+        <div class="page-actions"></div>
+        <div class="tab-bar">
+          <div class="tab active">Branding</div>
+          <div class="tab">Login labels</div>
+        </div>
+      </div>
+      <div class="content-area">
+        <div class="empty-state"><div class="empty-icon">🎨</div><div class="empty-title">Customize login</div><div class="empty-body">Upload a logo and customize labels shown on the district login page.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: ACCESS LOGS ══ -->
+    <div class="screen" id="screen-logs">
+      <div class="page-header" style="padding-bottom:20px;">
+        <div class="page-title">Access logs</div>
+      </div>
+      <div class="content-area">
+        <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Access logs</div><div class="empty-body">Authentication event history and login logs for your district.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: PLACEHOLDER ══ -->
+    <div class="screen" id="screen-placeholder">
+      <div class="content-area" style="padding-top:64px;">
+        <div class="empty-state"><div class="empty-icon">🚧</div><div class="empty-title">Not included in this prototype</div><div class="empty-body">This section is outside the Authenticators scope for this iteration.</div><button class="btn-primary" style="margin:0 auto;" onclick="showScreen('authenticators')">Back to Authenticators</button></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
+    const target = document.getElementById('screen-' + id) || document.getElementById('screen-placeholder');
+    target.classList.add('visible');
+    document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
+    const subEl = document.getElementById('sub-' + id);
+    if (subEl) subEl.classList.add('active');
+    if (id === 'security-policies') renderSpTab('login');
+    if (id === 'authenticators') renderTrustList();
+    if (id === 'recovery') { renderClaimingList(); renderNotifList(); }
+  }
+
+  function navTo(id) {
+    showScreen('placeholder');
+    document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
+  }
+
+  function toggleUM() {
+    const sub = document.getElementById('um-sub');
+    const chev = document.getElementById('um-chevron');
+    const open = sub.style.display !== 'none';
+    sub.style.display = open ? 'none' : 'block';
+    chev.classList.toggle('open', !open);
+  }
+
+  function switchAuthTab(tab) {
+    ['list','trust'].forEach(t => {
+      document.getElementById('authtab-' + t).classList.toggle('active', t === tab);
+      const el = document.getElementById('authcontent-' + t);
+      if (el) el.style.display = t === tab ? (t === 'trust' ? 'flex' : 'block') : 'none';
+    });
+    if (tab === 'trust') renderTrustList();
+  }
+
+  const TRUST_DATA = [
+    { id: 'tc1', name: 'MDM Managed Devices', attrs: [
+      { label: 'Description', value: 'Trusts devices enrolled in district MDM.' },
+      { label: 'Trust signal', value: 'MDM enrollment status' },
+      { label: 'Applies to groups', value: 'Everyone' },
+      { label: 'Effect', value: 'Skip MFA step-up on trusted device' },
+      { label: 'Status', value: 'Active' },
+    ]},
+    { id: 'tc2', name: 'CIDR Block – Campus Network', attrs: [
+      { label: 'Description', value: 'Trusts logins originating from on-campus IP range.' },
+      { label: 'Trust signal', value: 'IP range: 10.0.0.0/8' },
+      { label: 'Applies to groups', value: 'Teachers, Staff' },
+      { label: 'Effect', value: 'Reduce re-auth frequency to weekly' },
+      { label: 'Status', value: 'Active' },
+    ]},
+  ];
+
+  function renderTrustList() {
+    const list = document.getElementById('trust-list');
+    const def = TRUST_DATA[0].id;
+    if (!list) return;
+    list.innerHTML = '<div style="padding:8px 12px 4px;"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-secondary);">Conditions</span></div>' +
+      TRUST_DATA.map((p, i) => '<div class="sp-list-item ' + (p.id===def?'active':'') + '" id="tcitem-' + p.id + '" onclick="selectTrust(\'' + p.id + '\')"><span class="sp-item-num">' + (i+1) + '</span><span class="sp-item-name">' + p.name + '</span></div>').join('');
+    renderTrustDetail(def);
+  }
+
+  function selectTrust(id) {
+    document.querySelectorAll('[id^="tcitem-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('tcitem-' + id)?.classList.add('active');
+    renderTrustDetail(id);
+  }
+
+  function renderTrustDetail(id) {
+    const p = TRUST_DATA.find(x => x.id === id); if (!p) return;
+    const rows = p.attrs.filter(a => a.value).map(a => '<tr><td>' + a.label + '</td><td>' + a.value + '</td></tr>').join('');
+    document.getElementById('trust-detail').innerHTML =
+      '<div class="sp-detail-header"><div class="sp-detail-title">' + p.name + '</div>' +
+      '<div class="sp-detail-actions"><button class="btn-outline danger">Delete</button><button class="btn-outline">Edit</button></div></div>' +
+      '<table class="attr-table"><thead><tr><th>Attribute</th><th>Configuration</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  function toggleAuth() {
+    const sub = document.getElementById('auth-sub');
+    const chevron = document.getElementById('auth-chevron');
+    const isOpen = sub.style.display !== 'none';
+    sub.style.display = isOpen ? 'none' : 'block';
+    chevron.classList.toggle('open', !isOpen);
+  }
+
+  // ── SECURITY POLICIES DATA ──
+  const SP_DATA = {
+    login: [
+      { id: 'lp1', name: 'Default Policy', attrs: [
+        { label: 'Description', value: 'Applies to all users if no other login policy matches.' },
+        { label: 'Assigned to groups', value: 'Everyone' },
+        { label: 'Authentication methods', value: 'Clever Passwords, Google IdP, Badges' },
+        { label: 'Re-authentication frequency', value: 'Every 7 days' },
+        { label: 'Status', value: 'Active' },
+      ]},
+      { id: 'lp2', name: 'Staff SSO Policy', attrs: [
+        { label: 'Description', value: 'Forces SSO for all staff users.' },
+        { label: 'Assigned to groups', value: 'Teachers, Staff' },
+        { label: 'Authentication methods', value: 'Google IdP, Microsoft Entra ID' },
+        { label: 'Re-authentication frequency', value: 'Every 24 hours' },
+        { label: 'Status', value: 'Active' },
+      ]},
+      { id: 'lp3', name: 'K–2 Badge Only', attrs: [
+        { label: 'Description', value: 'Restricts K–2 students to badge login only.' },
+        { label: 'Assigned to groups', value: 'Students – Grade K, Grade 1, Grade 2' },
+        { label: 'Authentication methods', value: 'Badges, Pictures' },
+        { label: 'Re-authentication frequency', value: 'Every session' },
+        { label: 'Status', value: 'Active' },
+      ]},
+    ],
+    password: [
+      { id: 'pp1', name: 'Default Password Policy', attrs: [
+        { label: 'Assigned to groups', value: 'Everyone' },
+        { label: 'Minimum length', value: '8 characters' },
+        { label: 'Complexity', value: 'Uppercase, number required' },
+        { label: 'Expiry', value: 'Every 180 days' },
+        { label: 'Lockout after', value: '5 failed attempts' },
+        { label: 'Status', value: 'Active' },
+      ]},
+      { id: 'pp2', name: 'Admin Strong Password', attrs: [
+        { label: 'Assigned to groups', value: 'District Admins, School Admins' },
+        { label: 'Minimum length', value: '12 characters' },
+        { label: 'Complexity', value: 'Uppercase, number, special character required' },
+        { label: 'Expiry', value: 'Every 90 days' },
+        { label: 'Lockout after', value: '3 failed attempts' },
+        { label: 'Status', value: 'Active' },
+      ]},
+    ],
+    badge: [
+      { id: 'bp1', name: 'Chrome Badge Policy', attrs: [
+        { label: 'Assigned to groups', value: 'Students – All grades' },
+        { label: 'Badge type', value: 'QR code' },
+        { label: 'Platform', value: 'Chromebook' },
+        { label: 'Fallback method', value: 'Clever Passwords' },
+        { label: 'Status', value: 'Active' },
+      ]},
+      { id: 'bp2', name: 'Windows Badge Policy', attrs: [
+        { label: 'Assigned to groups', value: 'Teachers, Staff' },
+        { label: 'Badge type', value: 'NFC / Barcode' },
+        { label: 'Platform', value: 'Windows' },
+        { label: 'Fallback method', value: 'Google IdP' },
+        { label: 'Status', value: 'Active' },
+      ]},
+    ],
+    mfa: [
+      { id: 'mfa1', name: 'IEP No Enforcement Date', attrs: [
+        { label: 'Policy description', value: 'MFA optional for IEP students, no enforcement date set.' },
+        { label: 'User groups', value: 'Students – IEP' },
+        { label: 'Authentication methods', value: 'Badge, Picture' },
+        { label: 'Enforcement date', value: 'Not set' },
+        { label: 'Re-authentication frequency', value: 'Every time' },
+      ]},
+      { id: 'mfa2', name: '9th Grade', attrs: [
+        { label: 'Policy description', value: '' },
+        { label: 'User groups', value: 'Students' },
+        { label: 'Student grades', value: 'Grade 9' },
+        { label: 'Authentication methods', value: 'Biometrics or security key, Mobile app, Badge, Picture' },
+        { label: 'Authenticator app', value: 'Google Authenticator' },
+        { label: 'Picture type', value: 'Cartoons' },
+        { label: 'Enforcement date', value: '2024-05-06' },
+        { label: 'Re-authentication frequency', value: 'Every time' },
+      ]},
+      { id: 'mfa3', name: 'First 3 teachers in the list', attrs: [
+        { label: 'User groups', value: 'Teachers' },
+        { label: 'Authentication methods', value: 'Badge, Mobile app' },
+        { label: 'Enforcement date', value: '2024-08-01' },
+        { label: 'Re-authentication frequency', value: 'Every 24 hours' },
+      ]},
+      { id: 'mfa4', name: '2nd MFA Group', attrs: [
+        { label: 'User groups', value: 'Staff' },
+        { label: 'Authentication methods', value: 'PIN, Badge' },
+        { label: 'Enforcement date', value: '2024-09-01' },
+        { label: 'Re-authentication frequency', value: 'Every 7 days' },
+      ]},
+      { id: 'mfa5', name: '10th Grade must use Badge', attrs: [
+        { label: 'User groups', value: 'Students' },
+        { label: 'Student grades', value: 'Grade 10' },
+        { label: 'Authentication methods', value: 'Badge only' },
+        { label: 'Enforcement date', value: '2024-05-06' },
+        { label: 'Re-authentication frequency', value: 'Every session' },
+      ]},
+    ],
+    trust: [
+      { id: 'tc1', name: 'MDM Managed Devices', attrs: [
+        { label: 'Description', value: 'Trusts devices enrolled in district MDM.' },
+        { label: 'Trust signal', value: 'MDM enrollment status' },
+        { label: 'Applies to groups', value: 'Everyone' },
+        { label: 'Effect', value: 'Skip MFA step-up on trusted device' },
+        { label: 'Status', value: 'Active' },
+      ]},
+      { id: 'tc2', name: 'CIDR Block – Campus Network', attrs: [
+        { label: 'Description', value: 'Trusts logins originating from on-campus IP range.' },
+        { label: 'Trust signal', value: 'IP range: 10.0.0.0/8' },
+        { label: 'Applies to groups', value: 'Teachers, Staff' },
+        { label: 'Effect', value: 'Reduce re-auth frequency to weekly' },
+        { label: 'Status', value: 'Active' },
+      ]},
+    ],
+  };
+
+  let currentSpTab = 'login';
+  let selectedPolicyId = null;
+
+  function switchSpTab(tab) {
+    currentSpTab = tab;
+    selectedPolicyId = null;
+    ['login','password','badge'].forEach(t => {
+      document.getElementById('sptab-' + t).classList.toggle('active', t === tab);
+    });
+    renderSpTab(tab);
+  }
+
+  function renderSpTab(tab) {
+    const policies = SP_DATA[tab] || [];
+    const list = document.getElementById('sp-list');
+    const detail = document.getElementById('sp-detail');
+
+    // default select first item
+    const defaultId = policies[0]?.id || null;
+    selectedPolicyId = defaultId;
+
+    list.innerHTML = policies.map((p, i) => `
+      <div class="sp-list-item ${p.id === defaultId ? 'active' : ''}" id="spitem-${p.id}" onclick="selectPolicy('${p.id}', '${tab}')">
+        <svg class="sp-drag" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span class="sp-item-num">${i + 1}</span>
+        <span class="sp-item-name">${p.name}</span>
+      </div>
+    `).join('');
+
+    if (defaultId) renderDetail(defaultId, tab);
+    else detail.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><div class="empty-title">No policies yet</div><div class="empty-body">Add a policy to get started.</div></div>`;
+  }
+
+  function selectPolicy(id, tab) {
+    selectedPolicyId = id;
+    document.querySelectorAll('.sp-list-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('spitem-' + id)?.classList.add('active');
+    renderDetail(id, tab);
+  }
+
+  function renderDetail(id, tab) {
+    const policies = SP_DATA[tab] || [];
+    const policy = policies.find(p => p.id === id);
+    if (!policy) return;
+    const detail = document.getElementById('sp-detail');
+    const rows = policy.attrs.filter(a => a.value).map(a => `
+      <tr>
+        <td>${a.label}</td>
+        <td>${a.value}</td>
+      </tr>
+    `).join('');
+    detail.innerHTML = `
+      <div class="sp-detail-header">
+        <div class="sp-detail-title">${policy.name}</div>
+        <div class="sp-detail-actions">
+          <button class="btn-outline danger">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            Delete
+          </button>
+          <button class="btn-outline">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            Edit
+          </button>
+        </div>
+      </div>
+      <table class="attr-table">
+        <thead><tr><th>Attribute</th><th>Configuration</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  // ── ACCOUNT ACCESS DATA ──
+  const AA_CLAIMING = [
+    { id: 'ac1', name: 'Students', status: 'enabled', destinations: ['clever'], fields: ['Email address', 'SIS ID', 'Date of birth'] },
+    { id: 'ac2', name: 'Teachers', status: 'enabled', destinations: ['windows','google','clever'], fields: ['Email address', 'Staff ID'] },
+    { id: 'ac3', name: 'Ridgemont school admins', status: 'enabled', destinations: ['google','clever'], fields: ['Email address', 'Staff ID'] },
+    { id: 'ac4', name: 'Temporary staff', status: 'inactive', destinations: [], fields: [] },
+    { id: 'ac5', name: '9th grade students', status: 'enabled', destinations: ['clever'], fields: ['SIS ID', 'Date of birth'] },
+  ];
+  const AA_NOTIF = [
+    { id: 'an1', name: 'Students', status: 'enabled', notifType: 'Account creation', destinations: ['windows','google','clever'] },
+    { id: 'an2', name: 'Teachers', status: 'inactive', notifType: null, destinations: [] },
+    { id: 'an3', name: 'Staff', status: 'enabled', notifType: 'Claim link', destinations: ['clever'] },
+    { id: 'an4', name: 'Ridgemont school admins', status: 'enabled', notifType: 'Claim link', destinations: ['google','clever'] },
+    { id: 'an5', name: 'Temporary staff', status: 'inactive', notifType: null, destinations: [] },
+  ];
+
+  function destIconsHtml(dests) {
+    const map = { clever:'<span class="dest-icon dest-clever">C</span>', google:'<span class="dest-icon dest-google">G</span>', windows:'<span class="dest-icon dest-windows">⊞</span>' };
+    if (!dests.length) return '<span class="text-secondary" style="font-size:13px;">None</span>';
+    return '<div class="dest-icons">' + dests.map(d => map[d]||'').join('') + '</div>';
+  }
+
+  function statusBadgeHtml(enabled) {
+    return enabled
+      ? '<span class="status-badge status-active"><span class="status-dot"></span>Enabled</span>'
+      : '<span class="status-badge status-inactive"><span class="status-dot"></span>Inactive</span>';
+  }
+
+  function renderClaimingList() {
+    const list = document.getElementById('aa-claiming-list');
+    const def = AA_CLAIMING[0].id;
+    list.innerHTML = `<div style="padding:8px 12px 4px;"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-secondary);">Groups</span></div>`
+      + AA_CLAIMING.map(g => `
+        <div class="sp-list-item ${g.id===def?'active':''}" id="acitem-${g.id}" onclick="selectClaimingGroup('${g.id}')">
+          <span class="sp-item-name">${g.name}</span>
+          <span style="width:8px;height:8px;border-radius:50%;background:${g.status==='enabled'?'var(--status-active)':'var(--border-secondary)'};flex-shrink:0;"></span>
+        </div>`).join('');
+    renderClaimingDetail(def);
+  }
+
+  function selectClaimingGroup(id) {
+    document.querySelectorAll('[id^="acitem-"]').forEach(el=>el.classList.remove('active'));
+    document.getElementById('acitem-'+id)?.classList.add('active');
+    renderClaimingDetail(id);
+  }
+
+  function renderClaimingDetail(id) {
+    const g = AA_CLAIMING.find(x=>x.id===id); if(!g) return;
+    const enabled = g.status==='enabled';
+    document.getElementById('aa-claiming-detail').innerHTML = `
+      <div class="sp-detail-header">
+        <div class="sp-detail-title">${g.name}</div>
+        <div class="sp-detail-actions">
+          <button class="btn-outline danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Delete</button>
+          <button class="btn-outline" onclick="openClaimingDrawer('${g.name}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> Edit</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:14px 20px;background:var(--bg-primary);border:1px solid var(--border-primary);border-radius:8px;">
+        <span style="font-size:14px;font-weight:500;color:var(--text-header);">Allow access to account claim page from sign-on page</span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <label class="toggle"><input type="checkbox" ${enabled?'checked':''}/><span class="toggle-slider"></span></label>
+          <button class="btn-outline" style="font-size:13px;height:32px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg> Copy URL</button>
+        </div>
+      </div>
+      <table class="attr-table">
+        <thead><tr><th>Attribute</th><th>Configuration</th></tr></thead>
+        <tbody>
+          <tr><td>Status</td><td>${statusBadgeHtml(enabled)}</td></tr>
+          <tr><td>Security fields</td><td>${g.fields.length?g.fields.join(', '):'—'}</td></tr>
+          <tr><td>Destinations</td><td>${destIconsHtml(g.destinations)}</td></tr>
+        </tbody>
+      </table>`;
+  }
+
+  function renderNotifList() {
+    const list = document.getElementById('aa-notif-list');
+    const def = AA_NOTIF[0].id;
+    list.innerHTML = `<div style="padding:8px 12px 4px;"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-secondary);">Groups</span></div>`
+      + AA_NOTIF.map(g => `
+        <div class="sp-list-item ${g.id===def?'active':''}" id="anitem-${g.id}" onclick="selectNotifGroup('${g.id}')">
+          <span class="sp-item-name">${g.name}</span>
+          <span style="width:8px;height:8px;border-radius:50%;background:${g.status==='enabled'?'var(--status-active)':'var(--border-secondary)'};flex-shrink:0;"></span>
+        </div>`).join('');
+    renderNotifDetail(def);
+  }
+
+  function selectNotifGroup(id) {
+    document.querySelectorAll('[id^="anitem-"]').forEach(el=>el.classList.remove('active'));
+    document.getElementById('anitem-'+id)?.classList.add('active');
+    renderNotifDetail(id);
+  }
+
+  function renderNotifDetail(id) {
+    const g = AA_NOTIF.find(x=>x.id===id); if(!g) return;
+    const enabled = g.status==='enabled';
+    document.getElementById('aa-notif-detail').innerHTML = `
+      <div class="sp-detail-header">
+        <div class="sp-detail-title">${g.name}</div>
+        <div class="sp-detail-actions">
+          <button class="btn-outline danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Delete</button>
+          <button class="btn-outline" onclick="openNotifWizard('${g.name}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> Edit</button>
+        </div>
+      </div>
+      <table class="attr-table">
+        <thead><tr><th>Attribute</th><th>Configuration</th></tr></thead>
+        <tbody>
+          <tr><td>Status</td><td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              ${statusBadgeHtml(enabled)}
+              <label class="toggle"><input type="checkbox" ${enabled?'checked':''}/><span class="toggle-slider"></span></label>
+            </div>
+          </td></tr>
+          <tr><td>Notification type</td><td>${g.notifType||'<span class="text-secondary">None</span>'}</td></tr>
+          <tr><td>Destinations</td><td>${destIconsHtml(g.destinations)}</td></tr>
+        </tbody>
+      </table>`;
+  }
+
+  // ── ACCOUNT ACCESS TABS ──
+  function switchAaTab(tab) {
+    ['claiming','notifications','reset'].forEach(t => {
+      document.getElementById('aatab-'+t).classList.toggle('active', t===tab);
+      const el = document.getElementById('aacontent-'+t);
+      if (el) el.style.display = t===tab ? (t==='reset'?'block':'flex') : 'none';
+    });
+    const btn = document.getElementById('aa-page-actions');
+    if (btn) btn.style.display = tab==='reset' ? 'none' : 'flex';
+  }
+
+  function openAaAddDrawer() { openClaimingDrawer('New group'); }
+
+  // ── CLAIMING DRAWER ──
+  function openClaimingDrawer(groupName) {
+    document.getElementById('claiming-drawer-title').textContent = groupName + ' — Account Claiming Setup';
+    document.getElementById('claiming-drawer-overlay').classList.add('open');
+  }
+  function closeClaimingDrawer() { document.getElementById('claiming-drawer-overlay').classList.remove('open'); }
+  function handleClaimingOverlayClick(e) { if(e.target===document.getElementById('claiming-drawer-overlay')) closeClaimingDrawer(); }
+
+  // ── NOTIFICATIONS WIZARD ──
+  function openNotifWizard(groupName) {
+    document.getElementById('notif-wizard-title').textContent = groupName + ' — Notifications';
+    document.getElementById('notif-wizard-overlay').classList.add('open');
+  }
+  function closeNotifWizard() { document.getElementById('notif-wizard-overlay').classList.remove('open'); }
+  function handleNotifOverlayClick(e) { if(e.target===document.getElementById('notif-wizard-overlay')) closeNotifWizard(); }
+
+  function openPolicyDrawer() { document.getElementById('policy-drawer-overlay').classList.add('open'); }
+  function closePolicyDrawer() { document.getElementById('policy-drawer-overlay').classList.remove('open'); }
+
+
+</script>
+<!-- ── ADD POLICY DRAWER ── -->
+<div class="drawer-overlay" id="policy-drawer-overlay" onclick="handleOverlayClick(event)">
+  <div class="drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">Add policy</div>
+      <button class="drawer-close" onclick="closePolicyDrawer()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="form-field">
+        <label class="form-label">Policy name</label>
+        <input class="form-input" type="text" placeholder="TIP: Describe what this policy does" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Policy description</label>
+        <textarea class="form-textarea" placeholder="Description"></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Policy type</label>
+        <select class="form-select">
+          <option value="">Select policy type</option>
+          <option>Login policy</option>
+          <option>Password policy</option>
+          <option>Badge management</option>
+          <option>MFA enforcement</option>
+          <option>Trust condition</option>
+        </select>
+      </div>
+      <hr class="form-divider" />
+      <div class="form-field">
+        <label class="form-label">Assign to groups</label>
+        <input class="form-input" type="text" placeholder="Search groups…" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Authentication methods</label>
+        <select class="form-select">
+          <option value="">Select methods</option>
+          <option>Clever Passwords</option>
+          <option>Google IdP</option>
+          <option>Badges</option>
+          <option>PIN</option>
+          <option>Pictures</option>
+          <option>SMS / Voice</option>
+          <option>Biometric</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Re-authentication frequency</label>
+        <select class="form-select">
+          <option>Every session</option>
+          <option>Every 24 hours</option>
+          <option>Every 7 days</option>
+          <option>Every 30 days</option>
+          <option>Every time</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Enforcement date</label>
+        <input class="form-input" type="date" />
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn-outline" onclick="closePolicyDrawer()">Cancel</button>
+      <button class="btn-primary" onclick="closePolicyDrawer()">Save policy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('policy-drawer-overlay')) closePolicyDrawer();
+  }
+  // Init security policies on first nav
+  document.addEventListener('DOMContentLoaded', () => { renderTrustList(); });
+</script>
+</body>
+</html>
