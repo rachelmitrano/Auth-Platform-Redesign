@@ -854,7 +854,7 @@
       <div class="page-header">
         <div class="page-title">Authenticators</div>
         <div class="page-actions">
-          <button class="btn-primary">
+          <button class="btn-primary" onclick="openAddAuthModal()">
             Add authenticator
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
           </button>
@@ -877,33 +877,7 @@
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td><div class="auth-name">Clever Passwords</div><div class="auth-desc">Username + password login via Clever</div></td>
-                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td style="width:80px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;"><button class="action-btn" title="Edit" onclick="openSamlModal()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='Clever Passwords';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div></td>
-              </tr>
-              <tr>
-                <td><div class="auth-name">Google IdP</div><div class="auth-desc">Sign in with Google account</div></td>
-                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td style="width:80px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;"><button class="action-btn" title="Edit" onclick="openGoogleAuthModal()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='Google IdP';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div></td>
-              </tr>
-              <tr>
-                <td><div class="auth-name">Badges</div><div class="auth-desc">Physical or digital badge scan (Chrome, Windows, Badges+)</div></td>
-                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td style="width:80px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;"><button class="action-btn" title="Edit" onclick="openSamlModal()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='Badges';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div></td>
-              </tr>
-              <tr>
-                <td><div class="auth-name">SAML 2.0</div><div class="auth-desc">Enterprise SSO via SAML</div></td>
-                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td style="width:80px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;"><button class="action-btn" title="Edit" onclick="openSamlModal()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='SAML 2.0';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div></td>
-              </tr>
-              <tr>
-                <td><div class="auth-name">Pictures</div><div class="auth-desc">Image-based authentication for younger students</div></td>
-                <td><span class="status-badge status-active"><span class="status-dot"></span>Active</span></td>
-                <td style="width:80px;white-space:nowrap;"><div style="display:flex;align-items:center;gap:4px;"><button class="action-btn" title="Edit" onclick="openSamlModal()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="action-btn" title="Delete" onclick="currentAuthName='Pictures';confirmDelete()" style="padding:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#dc2626"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button></div></td>
-              </tr>
-            </tbody>
+            <tbody id="auth-tbody"></tbody>
           </table>
           <div class="table-footer">
             <select class="rows-select"><option>Show 25 rows</option><option>Show 50 rows</option></select>
@@ -4542,6 +4516,380 @@ function ppwSave() {
   switchSpTab('password');
   setTimeout(function() { selectPolicy(newId, 'password'); }, 150);
 }
+</script>
+
+
+<!-- ══ ADD AUTHENTICATOR MODAL ══ -->
+<style>
+.add-auth-overlay {
+  display:none; position:fixed; inset:0; z-index:400;
+  background:rgba(0,0,0,.45); align-items:center; justify-content:center;
+}
+.add-auth-overlay.open { display:flex; }
+.add-auth-box {
+  background:#fff; border-radius:12px; width:860px; max-width:95vw;
+  max-height:90vh; overflow-y:auto; padding:40px 40px 32px;
+  position:relative; font-family:'Proxima Nova',-apple-system,sans-serif;
+}
+.add-auth-close {
+  position:absolute; top:20px; right:24px;
+  background:none; border:none; cursor:pointer; font-size:24px;
+  color:#13151a; line-height:1; padding:4px;
+}
+.add-auth-close:hover { color:#1464ff; }
+.add-auth-title { font-size:28px; font-weight:700; color:#13151a; margin-bottom:16px; letter-spacing:-.3px; }
+.add-auth-desc { font-size:16px; color:#3c404f; line-height:1.6; margin-bottom:28px; }
+.add-auth-desc a { color:#1464ff; font-weight:600; text-decoration:none; }
+.add-auth-desc a:hover { text-decoration:underline; }
+
+.add-auth-section-label {
+  font-size:12px; font-weight:700; color:#6b7280;
+  text-transform:uppercase; letter-spacing:.6px;
+  margin:0 0 10px;
+}
+.add-auth-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+
+.auth-option-card {
+  border:1px solid #e8eaf0; border-radius:8px; padding:16px;
+  cursor:pointer; transition:border-color .15s, background .15s;
+  display:flex; flex-direction:column; gap:0;
+}
+.auth-option-card:hover { border-color:#1464ff; background:#f0f7ff; }
+.auth-option-card-header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.auth-option-icon {
+  width:36px; height:36px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  background:#f5f7fa;
+}
+.auth-option-name { font-size:15px; font-weight:600; color:#13151a; line-height:1.3; }
+.auth-option-divider { border:none; border-top:1px solid #e8eaf0; margin-bottom:10px; }
+.auth-option-req-label { font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+.auth-option-req-item { font-size:13px; color:#3c404f; line-height:1.5; margin-bottom:2px; }
+.auth-option-req-item::before { content:""; }
+
+.add-auth-footer { margin-top:8px; }
+.add-auth-cancel {
+  height:48px; padding:0 28px; background:#1464ff; color:#fff;
+  border:none; border-radius:4px; font-family:inherit; font-size:16px;
+  font-weight:600; cursor:pointer;
+}
+.add-auth-cancel:hover { background:#0f55e0; }
+</style>
+
+<div class="add-auth-overlay" id="add-auth-modal" onclick="handleAddAuthOverlay(event)">
+  <div class="add-auth-box">
+    <button class="add-auth-close" onclick="closeAddAuthModal()">&times;</button>
+    <div class="add-auth-title">Choose Login Method</div>
+    <div class="add-auth-desc">
+      Configure how students, teachers, and staff will log into Clever. Not sure which one to pick?
+      Choose credentials users already know. For more information, check out our
+      <a href="#">Help Center</a> for guidance.
+    </div>
+
+    <!-- Identity Providers -->
+    <div class="add-auth-section-label">Identity Providers</div>
+    <div class="add-auth-grid">
+
+      <div class="auth-option-card" onclick="closeAddAuthModal();openGoogleAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          </div>
+          <div class="auth-option-name">Google Authentication</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">Users in Clever must have their google email as the email field</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal();openSamlModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#1e293b;">
+            <span class="material-icons" style="font-size:20px;color:#fff;">security</span>
+          </div>
+          <div class="auth-option-name">SAML Authentication</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">A configured SAML IDP such as Active Directory (ADFS or Entra), Okta, RapidIdentity, or Duo</div>
+        <div class="auth-option-req-item">Metadata file accessible over HTTPS with a certificate signed by a valid Certificate Authority</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#e8f0fe;">
+            <span class="material-icons" style="font-size:20px;color:#1464ff;">lock</span>
+          </div>
+          <div class="auth-option-name">Clever Passwords Authentication</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">Synced SIS data</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#fff3e0;">
+            <span class="material-icons" style="font-size:20px;color:#f57c00;">school</span>
+          </div>
+          <div class="auth-option-name">Canvas Authentication</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">Actively using Canvas LMS</div>
+        <div class="auth-option-req-item">URL of your district&#39;s Canvas instance</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#1e293b;">
+            <span class="material-icons" style="font-size:20px;color:#fff;">lock_outline</span>
+          </div>
+          <div class="auth-option-name">LDAP Authentication</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">LDAP Server</div>
+        <div class="auth-option-req-item">Credentials for a BIND account</div>
+      </div>
+
+    </div>
+
+    <!-- MFA Methods -->
+    <div class="add-auth-section-label">Multi-Factor Authentication (MFA)</div>
+    <div class="add-auth-grid">
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#e8f5e9;">
+            <span class="material-icons" style="font-size:20px;color:#2e7d32;">badge</span>
+          </div>
+          <div class="auth-option-name">Badges</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">Physical or digital badge (Chrome, Windows, Badges+)</div>
+        <div class="auth-option-req-item">Compatible badge reader hardware</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#fce4ec;">
+            <span class="material-icons" style="font-size:20px;color:#c2185b;">image</span>
+          </div>
+          <div class="auth-option-name">Pictures</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">Recommended for younger students (K–5)</div>
+        <div class="auth-option-req-item">Student photos synced via SIS</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#ede7f6;">
+            <span class="material-icons" style="font-size:20px;color:#512da8;">dialpad</span>
+          </div>
+          <div class="auth-option-name">PIN</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">Recommended for students (K–8)</div>
+        <div class="auth-option-req-item">No additional hardware required</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#e3f2fd;">
+            <span class="material-icons" style="font-size:20px;color:#1565c0;">sms</span>
+          </div>
+          <div class="auth-option-name">Text Message (SMS)</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">User must have a verified mobile phone number on file</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#fff8e1;">
+            <span class="material-icons" style="font-size:20px;color:#f9a825;">grid_view</span>
+          </div>
+          <div class="auth-option-name">Authenticator App (TOTP)</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">User must install an authenticator app (Google Authenticator, Authy, etc.)</div>
+      </div>
+
+      <div class="auth-option-card" onclick="closeAddAuthModal()">
+        <div class="auth-option-card-header">
+          <div class="auth-option-icon" style="background:#fafafa;">
+            <span class="material-icons" style="font-size:20px;color:#37474f;">fingerprint</span>
+          </div>
+          <div class="auth-option-name">Passkey / WebAuthn</div>
+        </div>
+        <hr class="auth-option-divider"/>
+        <div class="auth-option-req-label">Requirements</div>
+        <div class="auth-option-req-item">Device with biometrics or hardware security key (FIDO2)</div>
+      </div>
+
+    </div>
+
+    <div class="add-auth-footer">
+      <button class="add-auth-cancel" onclick="closeAddAuthModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openAddAuthModal()  { document.getElementById('add-auth-modal').classList.add('open'); }
+function closeAddAuthModal() { document.getElementById('add-auth-modal').classList.remove('open'); }
+function handleAddAuthOverlay(e) { if (e.target === document.getElementById('add-auth-modal')) closeAddAuthModal(); }
+</script>
+
+
+<!-- ══ AUTH TABLE TOGGLE ══ -->
+<style>
+/* Dewey-style toggle */
+.auth-toggle {
+  position:relative; display:inline-flex; align-items:center;
+  width:52px; height:28px; cursor:pointer; flex-shrink:0;
+}
+.auth-toggle input { opacity:0; width:0; height:0; position:absolute; }
+.auth-toggle-track {
+  width:52px; height:28px; border-radius:999px;
+  background:#d1d5db; transition:background .2s;
+  display:flex; align-items:center; padding:0 3px;
+  box-sizing:border-box;
+}
+.auth-toggle input:checked ~ .auth-toggle-track { background:#1a6b47; }
+.auth-toggle-thumb {
+  width:22px; height:22px; border-radius:50%; background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .2s;
+  flex-shrink:0;
+}
+.auth-toggle input:checked ~ .auth-toggle-track .auth-toggle-thumb {
+  transform:translateX(24px);
+}
+.auth-toggle-icon { font-size:13px; line-height:1; }
+
+/* Status cell: badge + toggle side by side */
+.auth-status-cell { display:flex; align-items:center; gap:10px; white-space:nowrap; }
+
+/* Inactive badge override */
+.status-badge.status-inactive { background:#f3f4f6; color:#6b7280; }
+.status-badge.status-inactive .status-dot { background:#9ca3af; }
+</style>
+
+<script>
+var AUTH_ROWS = [
+  {id:'google',   name:'Google IdP',        desc:'Sign in with Google account',                             edit:true,  editFn:'openGoogleAuthModal()', active:true},
+  {id:'badges',   name:'Badges',            desc:'Physical or digital badge scan (Chrome, Windows, Badges+)', edit:false, editFn:'',                 active:true},
+  {id:'saml',     name:'SAML 2.0',          desc:'Enterprise SSO via SAML',                                 edit:true,  editFn:'openSamlModal()',      active:true},
+  {id:'pictures', name:'Pictures',          desc:'Image-based authentication for younger students',          edit:false, editFn:'',                    active:true}
+];
+
+var authState = {};
+AUTH_ROWS.forEach(function(r) { authState[r.id] = r.active; });
+
+var DOTS_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#6b7280"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>';
+
+function renderAuthTable() {
+  var tbody = document.getElementById('auth-tbody');
+  if (!tbody) return;
+  var html = '';
+  AUTH_ROWS.forEach(function(row) {
+    var active = !!authState[row.id];
+    var badgeClass = active ? 'status-badge status-active' : 'status-badge status-inactive';
+    var badgeLabel = active ? 'Enabled' : 'Inactive';
+    var checked = active ? 'checked' : '';
+
+    // Toggle: check icon when on, x icon when off
+    var checkIcon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="#1a6b47"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+    var xIcon     = '<svg width="11" height="11" viewBox="0 0 24 24" fill="#9ca3af"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+    var thumbIcon = active ? checkIcon : xIcon;
+
+    var toggle =
+      '<label class="auth-toggle" title="' + (active ? 'Disable' : 'Enable') + '">' +
+        '<input type="checkbox" ' + checked + ' onchange="toggleAuth(\'' + row.id + '\')">' +
+        '<div class="auth-toggle-track">' +
+          '<div class="auth-toggle-thumb"><span class="auth-toggle-icon">' + thumbIcon + '</span></div>' +
+        '</div>' +
+      '</label>';
+
+    var statusCell =
+      '<td><div class="auth-status-cell">' +
+        '<span class="' + badgeClass + '"><span class="status-dot"></span>' + badgeLabel + '</span>' +
+        toggle +
+      '</div></td>';
+
+    var editMenuItem = row.edit
+      ? '<div class="auth-menu-item" onclick="closeAllAuthMenus();' + row.editFn + '"><span class="material-icons" style="font-size:16px;color:#1464ff;">edit</span>Edit</div>'
+      : '';
+    var deleteMenuItem = '<div class="auth-menu-item auth-menu-item-danger" onclick="closeAllAuthMenus();currentAuthName=\'' + row.name + '\';confirmDelete()"><span class="material-icons" style="font-size:16px;color:#dc2626;">delete</span>Delete</div>';
+
+    var actionsCell =
+      '<td style="width:48px;text-align:center;position:relative;">' +
+        '<div style="position:relative;display:inline-block;">' +
+          '<button class="action-btn auth-overflow-btn" onclick="toggleAuthMenu(event,\'' + row.id + '\')" style="padding:6px;border-radius:4px;">' + DOTS_SVG + '</button>' +
+          '<div class="auth-dropdown" id="auth-menu-' + row.id + '">' +
+            editMenuItem +
+            deleteMenuItem +
+          '</div>' +
+        '</div>' +
+      '</td>';
+
+    html +=
+      '<tr>' +
+        '<td><div class="auth-name">' + row.name + '</div><div class="auth-desc">' + row.desc + '</div></td>' +
+        statusCell +
+        actionsCell +
+      '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function toggleAuth(id) {
+  authState[id] = !authState[id];
+  renderAuthTable();
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', renderAuthTable);
+</script>
+
+
+<style>
+.auth-overflow-btn:hover { background:#f5f7fa; }
+.auth-dropdown {
+  display:none; position:absolute; right:0; top:36px; z-index:200;
+  background:#fff; border:1px solid #e8eaf0; border-radius:6px;
+  box-shadow:0 4px 16px rgba(0,0,0,.12); min-width:140px; overflow:hidden;
+}
+.auth-dropdown.open { display:block; }
+.auth-menu-item {
+  display:flex; align-items:center; gap:8px;
+  padding:10px 16px; font-size:14px; font-weight:500; color:#3c404f;
+  cursor:pointer; white-space:nowrap;
+}
+.auth-menu-item:hover { background:#f5f7fa; }
+.auth-menu-item-danger { color:#dc2626; }
+.auth-menu-item-danger:hover { background:#fef2f2; }
+</style>
+<script>
+function toggleAuthMenu(e, id) {
+  e.stopPropagation();
+  closeAllAuthMenus();
+  var menu = document.getElementById('auth-menu-' + id);
+  if (menu) menu.classList.add('open');
+}
+function closeAllAuthMenus() {
+  document.querySelectorAll('.auth-dropdown').forEach(function(m){ m.classList.remove('open'); });
+}
+document.addEventListener('click', closeAllAuthMenus);
 </script>
 
 </body>
