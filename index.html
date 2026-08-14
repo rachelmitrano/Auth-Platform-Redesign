@@ -955,7 +955,6 @@
         <div class="tab-bar">
           <div class="tab active" id="aatab-claiming" onclick="switchAaTab('claiming')">Account claiming</div>
           <div class="tab" id="aatab-notifications" onclick="switchAaTab('notifications')">Account notifications</div>
-          <div class="tab" id="aatab-reset" onclick="switchAaTab('reset')">Password reset</div>
         </div>
       </div>
 
@@ -1383,16 +1382,58 @@
       <div class="page-header" style="padding-bottom:20px;">
         <div class="page-title">Clever IDM</div>
         <div class="page-actions">
-          <button class="btn-outline">Edit Active Directory provisioning</button>
-          <button class="btn-text-link" style="color:var(--brand-blue);font-size:14px;padding:0 8px;">Pause Active Directory sync</button>
+          <button class="btn-outline">Edit provisioning</button>
+          <button class="btn-text-link" style="color:var(--brand-blue);font-size:14px;padding:0 8px;">Pause sync</button>
         </div>
       </div>
       <div class="content-area" style="padding-top:8px;">
-        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">Destinations are services to which Clever can provision user accounts.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:28px;">Manage identity providers that Clever syncs and provisions user accounts from.</p>
+
+        <!-- ── Clever IdP (Free) ── -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="font-size:16px;font-weight:700;color:var(--text-header);">Clever IdP</span>
+          <span style="background:#ecfdf5;color:#065f46;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;">Free</span>
+        </div>
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:14px;">Built-in identity management included with every Clever account. No additional cost.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;">
+          <!-- Clever Passwords card -->
           <div style="border:2px solid var(--brand-blue);border-radius:8px;padding:20px;background:var(--bg-primary);">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-              <div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;background:#0078d4;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;">&#9633;</div><span style="font-size:14px;font-weight:600;">Microsoft Active Directory &#8211; Really AD</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:26px;height:26px;background:#1464ff;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                </div>
+                <span style="font-size:14px;font-weight:600;">Clever Passwords</span>
+              </div>
+              <span class="status-badge status-active"><span class="status-dot"></span>Active</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;margin-bottom:16px;">
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Users</div><div style="font-size:22px;font-weight:700;">4,210</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Active</div><div style="font-size:22px;font-weight:700;">3,988</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Locked</div><div style="font-size:22px;font-weight:700;">12</div></div>
+              <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Issue</div><div style="font-size:22px;font-weight:700;">0</div></div>
+            </div>
+            <div style="font-size:13px;color:var(--text-secondary);">Managed natively by Clever. Passwords are synced from your SIS or set directly by admins.</div>
+          </div>
+        </div>
+
+        <!-- ── External IdPs (Paid) ── -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="font-size:16px;font-weight:700;color:var(--text-header);">External IdPs</span>
+          <span style="background:#fef3c7;color:#92400e;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;">Paid</span>
+        </div>
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:14px;">Connect an external identity provider to sync and provision accounts. Requires a paid Clever IDM plan.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+
+          <!-- Active Directory -->
+          <div style="border:2px solid var(--brand-blue);border-radius:8px;padding:20px;background:var(--bg-primary);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:26px;height:26px;background:#0078d4;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;">&#9633;</div>
+                <span style="font-size:14px;font-weight:600;">Microsoft Active Directory – Really AD</span>
+              </div>
               <span class="status-badge status-active"><span class="status-dot"></span>Active</span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;">
@@ -1402,10 +1443,18 @@
               <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Issue</div><div style="font-size:22px;font-weight:700;">0</div></div>
             </div>
           </div>
+
+          <!-- Google Workspace -->
           <div style="border:1px solid var(--border-primary);border-radius:8px;padding:20px;background:var(--bg-primary);">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-              <div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;background:#fff;border:1px solid #dee0e5;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#ea4335;font-weight:700;">G</div><span style="font-size:14px;font-weight:600;">Google Workspace &#8211; Google playland</span></div>
-              <div style="display:flex;gap:6px;"><span class="status-badge status-active"><span class="status-dot"></span>Active</span><span style="background:#fff8e1;color:#b45309;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#9888; Issue</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:26px;height:26px;background:#fff;border:1px solid #dee0e5;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#ea4335;font-weight:700;">G</div>
+                <span style="font-size:14px;font-weight:600;">Google Workspace – Google playland</span>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <span class="status-badge status-active"><span class="status-dot"></span>Active</span>
+                <span style="background:#fff8e1;color:#b45309;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#9888; Issue</span>
+              </div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;">
               <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Create</div><div style="font-size:22px;font-weight:700;">0</div></div>
@@ -1414,10 +1463,18 @@
               <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Issue</div><div style="font-size:22px;font-weight:700;color:#dc2626;">8,412</div></div>
             </div>
           </div>
+
+          <!-- Microsoft Entra ID -->
           <div style="border:1px solid var(--border-primary);border-radius:8px;padding:20px;background:var(--bg-primary);">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-              <div style="display:flex;align-items:center;gap:8px;"><div style="width:26px;height:26px;background:#0078d4;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;">M</div><span style="font-size:14px;font-weight:600;">Microsoft Entra ID</span></div>
-              <div style="display:flex;gap:6px;"><span class="status-badge status-active"><span class="status-dot"></span>Active</span><span style="background:#fff8e1;color:#b45309;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#9888; Issue</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:26px;height:26px;background:#0078d4;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;">M</div>
+                <span style="font-size:14px;font-weight:600;">Microsoft Entra ID</span>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <span class="status-badge status-active"><span class="status-dot"></span>Active</span>
+                <span style="background:#fff8e1;color:#b45309;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px;">&#9888; Issue</span>
+              </div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);text-align:center;">
               <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Create</div><div style="font-size:22px;font-weight:700;">0</div></div>
@@ -1426,7 +1483,9 @@
               <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Issue</div><div style="font-size:22px;font-weight:700;color:#dc2626;">2</div></div>
             </div>
           </div>
+
         </div>
+
         <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">Your last Active Directory accounts sync was processed on 7/22/26, 1:15 AM</p>
         <div class="tab-bar" style="margin-bottom:20px;"><div class="tab active">Tasks</div><div class="tab">Sync History</div><div class="tab">Exports</div><div class="tab">Events</div></div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;"><div style="font-size:16px;font-weight:600;">Notifications</div><a href="#" style="font-size:13px;color:var(--brand-blue);">&#8595; Download user accounts</a></div>
@@ -2859,8 +2918,7 @@ function openPolicyWizardForActiveTab() {
 var LPW_STEPS = [
   'Select users',
   'Assign login methods',
-  'Assign First Factor MFA methods',
-  'Assign Second Factor MFA methods',
+  'Assign MFA methods',
   'MFA settings',
   'Policy name',
   'Preview'
@@ -2952,21 +3010,20 @@ function lpwRenderSidebar() {
 function lpwRenderFooter() {
   var labels = [
     'Continue to Assign login methods',
-    'Continue to Assign First Factor MFA methods',
-    'Continue to Assign Second Factor MFA methods',
+    'Continue to Assign MFA methods',
     'Continue to MFA settings',
     'Continue to Policy name',
     'Continue to Preview',
     'Save policy'
   ];
-  var fn = lpwS.step === 6 ? 'lpwSave()' : 'lpwNext()';
+  var fn = lpwS.step === 5 ? 'lpwSave()' : 'lpwNext()';
   document.getElementById('lpw-footer').innerHTML =
     '<button class="lpw-btn-primary" onclick="' + fn + '">' + labels[lpwS.step] + '</button>';
 }
 
 /* ── Content dispatcher ── */
 function lpwRenderContent() {
-  var fns = [lpwStep0, lpwStep1, lpwStep2, lpwStep3, lpwStep4, lpwStep5, lpwStep6];
+  var fns = [lpwStep0, lpwStep1, lpwStep2, lpwStep3, lpwStep4, lpwStep5];
   fns[lpwS.step]();
 }
 
@@ -3064,11 +3121,25 @@ function lpwStep1() {
     ? selectedNames.map(function(n){ return '<span class="lpw-chip">' + n + '</span>'; }).join('')
     : '<span style="font-size:14px;color:#6b7280;">None selected</span>';
 
-  var methods = [
-    {key:'google',  label:'Google Authentication',           link:false},
-    {key:'cp',      label:'Clever Passwords Authentication', link:true, linkText:'', linkHref:'#'},
-    {key:'badges',  label:'Badges Authentication',           link:false}
-  ];
+  // Build login methods dynamically from active IdP authenticators
+  var methods = [];
+  Object.keys(activeAuthenticators).forEach(function(id) {
+    var entry = AUTHENTICATOR_CATALOG[id];
+    if (entry && entry.category === 'idp') {
+      var labelMap = {
+        'google':    'Google Authentication',
+        'saml':      'SAML Authentication',
+        'clever_pw': 'Clever Passwords Authentication',
+        'canvas':    'Canvas Authentication',
+        'ldap':      'LDAP Authentication'
+      };
+      methods.push({key: id, label: labelMap[id] || entry.name, link: id === 'clever_pw', linkText: '', linkHref: '#'});
+    }
+  });
+  // Fallback: always show Clever Passwords if nothing else is active
+  if (methods.length === 0) {
+    methods.push({key: 'cp', label: 'Clever Passwords Authentication', link: true, linkText: '', linkHref: '#'});
+  }
 
   var cards = '';
   for (var i = 0; i < methods.length; i++) {
@@ -3101,8 +3172,7 @@ function lpwStep1() {
 /* ─────────────────────────────────────────────────── */
 /* STEP 2 & 3 – MFA methods                           */
 /* ─────────────────────────────────────────────────── */
-function lpwStep2() { lpwMfaStep('first'); }
-function lpwStep3() { lpwMfaStep('second'); }
+function lpwStep2() { lpwMfaStep('second'); }
 
 function lpwMfaStep(factor) {
   var isFirst = factor === 'first';
@@ -3119,39 +3189,26 @@ function lpwMfaStep(factor) {
     ? selectedNames.map(function(n){ return '<span class="lpw-chip">' + n + '</span>'; }).join('')
     : '<span style="font-size:14px;color:#6b7280;">None selected</span>';
 
-  var methods = [
-    {
-      key:'badges',
-      label:'Badges',
-      badge:'Recommended for teachers and students',
-      desc:'A user uses printed QR code, scans via device camera as a second factor after they have provided their password.',
-      link:'Read more about Badge as an MFA method',
-      href:'https://support.clever.com/s/articles/000001625'
-    },
-    {
-      key:'picture',
-      label:'Picture',
-      badge:'Available only for students',
-      desc:null,
-      descHtml:'A student chooses their pictures each time they are asked to verify. <strong>Select picture type:</strong>',
-      hasPicType:true,
-      link:'See how the pictures look', href:'#'
-    },
-    {
-      key:'pin',
-      label:'PIN',
-      badge:'Available only for students',
-      desc:'A user enters a 6-digit PIN each time they are asked to verify.',
-      link:null
-    },
-    {
-      key:'sms',
-      label:'Text message',
-      badge:null,
-      desc:'A user receives a one-time verification code via text message.',
-      link:'Watch a demo video', href:'#'
+  // Build MFA methods dynamically from active MFA authenticators
+  var mfaDetails = {
+    'badges':   {badge:'Recommended for teachers and students', desc:'A user scans a printed QR code or badge as a second factor.', link:'Read more about Badges as an MFA method'},
+    'pictures': {badge:'Students only', desc:'Students identify themselves using picture selection.', link:'Read more about Pictures as an MFA method'},
+    'pin':      {badge:'Students only', desc:'Students enter a short numeric PIN as a second factor.', link:'Read more about PIN as an MFA method'},
+    'sms':      {badge:'', desc:'A one-time code is sent to the user verified mobile number.', link:'Read more about SMS MFA'},
+    'totp':     {badge:'', desc:'User enters a TOTP code from an authenticator app (Google Authenticator, Authy, etc.).', link:'Read more about TOTP MFA'},
+    'webauthn': {badge:'', desc:'User authenticates with a FIDO2 device, biometric, or hardware security key.', link:'Read more about Passkeys'}
+  };
+  var methods = [];
+  Object.keys(activeAuthenticators).forEach(function(id) {
+    var entry = AUTHENTICATOR_CATALOG[id];
+    if (entry && entry.category === 'mfa') {
+      var details = mfaDetails[id] || {badge:'', desc:entry.desc, link:''};
+      methods.push(Object.assign({key: id, label: entry.name}, details));
     }
-  ];
+  });
+  if (methods.length === 0) {
+    methods = [{key:'badges', label:'Badges', badge:'Recommended for teachers and students', desc:'A user scans a printed QR code or badge as a second factor.', link:'Read more about Badges as an MFA method'}];
+  }
 
   var cards = '';
   for (var i = 0; i < methods.length; i++) {
@@ -3230,7 +3287,7 @@ function lpwMfaStep(factor) {
 /* ─────────────────────────────────────────────────── */
 /* STEP 4 – MFA settings                              */
 /* ─────────────────────────────────────────────────── */
-function lpwStep4() {
+function lpwStep3() {
   function radioRow(stateKey, val, label) {
     var sel = lpwS[stateKey] === val;
     return '<div class="lpw-radio-opt" onclick="lpwS.' + stateKey + '=\'' + val + '\';lpwStep4()">' +
@@ -3272,7 +3329,7 @@ function lpwStep4() {
 /* ─────────────────────────────────────────────────── */
 /* STEP 5 – Policy name                               */
 /* ─────────────────────────────────────────────────── */
-function lpwStep5() {
+function lpwStep3() {
   document.getElementById('lpw-content').innerHTML =
     '<div class="lpw-step-h1">Policy name</div>' +
     '<div class="lpw-step-sub">Give this policy a descriptive name.</div>' +
@@ -3288,7 +3345,7 @@ function lpwStep5() {
 /* ─────────────────────────────────────────────────── */
 /* STEP 6 – Preview                                   */
 /* ─────────────────────────────────────────────────── */
-function lpwStep6() {
+function lpwStep3() {
   var groupNames = LPW_GROUPS.filter(function(g){ return !!lpwS.selectedGroups[g.id]; }).map(function(g){ return g.name; });
   var lmMap = {google:'Google Authentication', cp:'Clever Passwords Authentication', badges:'Badges Authentication'};
   var selectedLogin = [];
@@ -3389,8 +3446,7 @@ function lpwSave() {
 LPW_STEPS = [
   'Select users',
   'Assign login methods',
-  'Assign First Factor MFA methods',
-  'Assign Second Factor MFA methods',
+  'Assign MFA methods',
   'Trust conditions',
   'MFA settings',
   'Policy name',
@@ -3415,15 +3471,14 @@ var _origFooter = lpwRenderFooter;
 lpwRenderFooter = function() {
   var labels = [
     'Continue to Assign login methods',
-    'Continue to Assign First Factor MFA methods',
-    'Continue to Assign Second Factor MFA methods',
+    'Continue to Assign MFA methods',
     'Continue to Trust conditions',
     'Continue to MFA settings',
     'Continue to Policy name',
     'Continue to Preview',
     'Save policy'
   ];
-  var fn = lpwS.step === 7 ? 'lpwSave()' : 'lpwNext()';
+  var fn = lpwS.step === 6 ? 'lpwSave()' : 'lpwNext()';
   document.getElementById('lpw-footer').innerHTML =
     '<button class="lpw-btn-primary" onclick="' + fn + '">' + labels[lpwS.step] + '</button>';
 };
@@ -3431,7 +3486,7 @@ lpwRenderFooter = function() {
 // Route step 4 to Trust conditions, shift existing steps
 var _origContent = lpwRenderContent;
 lpwRenderContent = function() {
-  var fns = [lpwStep0, lpwStep1, lpwStep2, lpwStep3, lpwStepTrust, lpwStep4, lpwStep5, lpwStep6];
+  var fns = [lpwStep0, lpwStep1, lpwStep2, lpwStepTrust, lpwStep4, lpwStep5, lpwStep6];
   fns[lpwS.step]();
 };
 
@@ -4590,7 +4645,7 @@ function ppwSave() {
     <div class="add-auth-section-label">Identity Providers</div>
     <div class="add-auth-grid">
 
-      <div class="auth-option-card" onclick="closeAddAuthModal();openGoogleAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('google');closeAddAuthModal();openGoogleAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon">
             <svg width="22" height="22" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
@@ -4602,7 +4657,7 @@ function ppwSave() {
         <div class="auth-option-req-item">Users in Clever must have their google email as the email field</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal();openSamlModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('saml');closeAddAuthModal();openSamlModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#1e293b;">
             <span class="material-icons" style="font-size:20px;color:#fff;">security</span>
@@ -4615,7 +4670,7 @@ function ppwSave() {
         <div class="auth-option-req-item">Metadata file accessible over HTTPS with a certificate signed by a valid Certificate Authority</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('clever_pw');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#e8f0fe;">
             <span class="material-icons" style="font-size:20px;color:#1464ff;">lock</span>
@@ -4627,7 +4682,7 @@ function ppwSave() {
         <div class="auth-option-req-item">Synced SIS data</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('canvas');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#fff3e0;">
             <span class="material-icons" style="font-size:20px;color:#f57c00;">school</span>
@@ -4640,7 +4695,7 @@ function ppwSave() {
         <div class="auth-option-req-item">URL of your district&#39;s Canvas instance</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('badges');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#1e293b;">
             <span class="material-icons" style="font-size:20px;color:#fff;">lock_outline</span>
@@ -4659,7 +4714,7 @@ function ppwSave() {
     <div class="add-auth-section-label">Multi-Factor Authentication (MFA)</div>
     <div class="add-auth-grid">
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('pictures');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#e8f5e9;">
             <span class="material-icons" style="font-size:20px;color:#2e7d32;">badge</span>
@@ -4672,7 +4727,7 @@ function ppwSave() {
         <div class="auth-option-req-item">Compatible badge reader hardware</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('pin');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#fce4ec;">
             <span class="material-icons" style="font-size:20px;color:#c2185b;">image</span>
@@ -4685,7 +4740,7 @@ function ppwSave() {
         <div class="auth-option-req-item">Student photos synced via SIS</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('sms');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#ede7f6;">
             <span class="material-icons" style="font-size:20px;color:#512da8;">dialpad</span>
@@ -4698,7 +4753,7 @@ function ppwSave() {
         <div class="auth-option-req-item">No additional hardware required</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('totp');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#e3f2fd;">
             <span class="material-icons" style="font-size:20px;color:#1565c0;">sms</span>
@@ -4710,7 +4765,7 @@ function ppwSave() {
         <div class="auth-option-req-item">User must have a verified mobile phone number on file</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('webauthn');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#fff8e1;">
             <span class="material-icons" style="font-size:20px;color:#f9a825;">grid_view</span>
@@ -4722,7 +4777,7 @@ function ppwSave() {
         <div class="auth-option-req-item">User must install an authenticator app (Google Authenticator, Authy, etc.)</div>
       </div>
 
-      <div class="auth-option-card" onclick="closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('webauthn');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#fafafa;">
             <span class="material-icons" style="font-size:20px;color:#37474f;">fingerprint</span>
@@ -4792,6 +4847,36 @@ var AUTH_ROWS = [
   {id:'pictures', name:'Pictures',          desc:'Image-based authentication for younger students',          edit:false, editFn:'',                    active:true}
 ];
 
+// ── Shared authenticator state (drives auth table + LPW steps 1 & 2) ──
+// Each entry: {id, name, desc, category:'idp'|'mfa', edit, editFn}
+var AUTHENTICATOR_CATALOG = {
+  'google':    {id:'google',    name:'Google IdP',        desc:'Sign in with Google account',                              category:'idp', edit:true,  editFn:'openGoogleAuthModal()'},
+  'saml':      {id:'saml',      name:'SAML 2.0',          desc:'Enterprise SSO via SAML',                                  category:'idp', edit:true,  editFn:'openSamlModal()'},
+  'badges':    {id:'badges',    name:'Badges',             desc:'Physical or digital badge scan (Chrome, Windows, Badges+)', category:'mfa', edit:false, editFn:''},
+  'pictures':  {id:'pictures',  name:'Pictures',           desc:'Image-based authentication for younger students',          category:'mfa', edit:false, editFn:''},
+  'pin':       {id:'pin',       name:'PIN',                desc:'Numeric PIN for younger students',                         category:'mfa', edit:false, editFn:''},
+  'sms':       {id:'sms',       name:'Text Message (SMS)', desc:'One-time code via SMS',                                    category:'mfa', edit:false, editFn:''},
+  'totp':      {id:'totp',      name:'Authenticator App',  desc:'TOTP via Google Authenticator, Authy, etc.',               category:'mfa', edit:false, editFn:''},
+  'webauthn':  {id:'webauthn',  name:'Passkey / WebAuthn', desc:'FIDO2 biometrics or hardware security key',               category:'mfa', edit:false, editFn:''},
+  'clever_pw': {id:'clever_pw', name:'Clever Passwords',   desc:'Username + password login via Clever',                    category:'idp', edit:false, editFn:''},
+  'canvas':    {id:'canvas',    name:'Canvas',              desc:'Authenticate via Canvas LMS',                             category:'idp', edit:false, editFn:''},
+  'ldap':      {id:'ldap',      name:'LDAP',                desc:'Enterprise LDAP authentication',                          category:'idp', edit:false, editFn:''}
+};
+
+// Active authenticators: starts with the initial table rows
+var activeAuthenticators = {
+  'google':   true,
+  'saml':     true,
+  'badges':   true,
+  'pictures': true
+};
+
+function addAuthenticator(id) {
+  activeAuthenticators[id] = true;
+  authState[id] = true;
+  renderAuthTable();
+}
+
 var authState = {};
 AUTH_ROWS.forEach(function(r) { authState[r.id] = r.active; });
 
@@ -4801,43 +4886,42 @@ function renderAuthTable() {
   var tbody = document.getElementById('auth-tbody');
   if (!tbody) return;
   var html = '';
-  AUTH_ROWS.forEach(function(row) {
-    var active = !!authState[row.id];
-    var badgeClass = active ? 'status-badge status-active' : 'status-badge status-inactive';
-    var badgeLabel = active ? 'Enabled' : 'Inactive';
-    var checked = active ? 'checked' : '';
+  var CHECK_ICON = '<svg width="12" height="12" viewBox="0 0 24 24" fill="#1a6b47"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+  var X_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="#9ca3af"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
 
-    // Toggle: check icon when on, x icon when off
-    var checkIcon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="#1a6b47"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-    var xIcon     = '<svg width="11" height="11" viewBox="0 0 24 24" fill="#9ca3af"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
-    var thumbIcon = active ? checkIcon : xIcon;
+  Object.keys(activeAuthenticators).forEach(function(id) {
+    var row = AUTHENTICATOR_CATALOG[id];
+    if (!row) return;
+    if (authState[id] === undefined) authState[id] = true;
+    var enabled = !!authState[id];
 
+    var badgeClass = enabled ? 'status-badge status-active' : 'status-badge status-inactive';
+    var badgeLabel = enabled ? 'Enabled' : 'Inactive';
+    var thumbIcon  = enabled ? CHECK_ICON : X_ICON;
+
+    // Build toggle using DOM to avoid any quote issues
     var toggle =
-      '<label class="auth-toggle" title="' + (active ? 'Disable' : 'Enable') + '">' +
-        '<input type="checkbox" ' + checked + ' onchange="toggleAuth(\'' + row.id + '\')">' +
+      '<label class="auth-toggle" title="' + (enabled ? 'Disable' : 'Enable') + '">' +
+        '<input type="checkbox" ' + (enabled ? 'checked' : '') + ' data-authid="' + id + '" onchange="handleToggleChange(this)">' +
         '<div class="auth-toggle-track">' +
           '<div class="auth-toggle-thumb"><span class="auth-toggle-icon">' + thumbIcon + '</span></div>' +
         '</div>' +
       '</label>';
 
-    var statusCell =
-      '<td><div class="auth-status-cell">' +
-        '<span class="' + badgeClass + '"><span class="status-dot"></span>' + badgeLabel + '</span>' +
-        toggle +
-      '</div></td>';
-
     var editMenuItem = row.edit
-      ? '<div class="auth-menu-item" onclick="closeAllAuthMenus();' + row.editFn + '"><span class="material-icons" style="font-size:16px;color:#1464ff;">edit</span>Edit</div>'
+      ? '<div class="auth-menu-item" onclick="closeAllAuthMenus();' + row.editFn + '">' +
+          '<span class="material-icons" style="font-size:16px;color:#1464ff;">edit</span>Edit</div>'
       : '';
-    var deleteMenuItem = '<div class="auth-menu-item auth-menu-item-danger" onclick="closeAllAuthMenus();currentAuthName=\'' + row.name + '\';confirmDelete()"><span class="material-icons" style="font-size:16px;color:#dc2626;">delete</span>Delete</div>';
+    var deleteMenuItem =
+      '<div class="auth-menu-item auth-menu-item-danger" data-delid="' + id + '" onclick="closeAllAuthMenus();removeAuthenticator(this.dataset.delid)">' +
+        '<span class="material-icons" style="font-size:16px;color:#dc2626;">delete</span>Delete</div>';
 
     var actionsCell =
       '<td style="width:48px;text-align:center;position:relative;">' +
         '<div style="position:relative;display:inline-block;">' +
-          '<button class="action-btn auth-overflow-btn" onclick="toggleAuthMenu(event,\'' + row.id + '\')" style="padding:6px;border-radius:4px;">' + DOTS_SVG + '</button>' +
-          '<div class="auth-dropdown" id="auth-menu-' + row.id + '">' +
-            editMenuItem +
-            deleteMenuItem +
+          '<button class="action-btn auth-overflow-btn" data-menuid="' + id + '" onclick="toggleAuthMenu(event,this.dataset.menuid)" style="padding:6px;border-radius:4px;">' + DOTS_SVG + '</button>' +
+          '<div class="auth-dropdown" id="auth-menu-' + id + '">' +
+            editMenuItem + deleteMenuItem +
           '</div>' +
         '</div>' +
       '</td>';
@@ -4845,22 +4929,55 @@ function renderAuthTable() {
     html +=
       '<tr>' +
         '<td><div class="auth-name">' + row.name + '</div><div class="auth-desc">' + row.desc + '</div></td>' +
-        statusCell +
+        '<td><div class="auth-status-cell">' +
+          '<span class="' + badgeClass + '"><span class="status-dot"></span>' + badgeLabel + '</span>' +
+          toggle +
+        '</div></td>' +
         actionsCell +
       '</tr>';
   });
   tbody.innerHTML = html;
 }
 
+function handleToggleChange(el) {
+  var id = el.dataset.authid;
+  authState[id] = el.checked;
+  renderAuthTable();
+}
+
 function toggleAuth(id) {
+  if (authState[id] === undefined) authState[id] = true;
   authState[id] = !authState[id];
   renderAuthTable();
 }
 
-// Init on load
-document.addEventListener('DOMContentLoaded', renderAuthTable);
-</script>
+function removeAuthenticator(id) {
+  delete activeAuthenticators[id];
+  delete authState[id];
+  renderAuthTable();
+}
 
+
+function closeAllAuthMenus() {
+  document.querySelectorAll('.auth-dropdown').forEach(function(m){ m.classList.remove('open'); });
+}
+document.addEventListener('click', closeAllAuthMenus);
+
+// Init on load — seed authState and render table
+document.addEventListener('DOMContentLoaded', function() {
+  Object.keys(activeAuthenticators).forEach(function(id) {
+    if (authState[id] === undefined) authState[id] = true;
+  });
+  renderAuthTable();
+});
+
+function toggleAuthMenu(e, id) {
+  e.stopPropagation();
+  closeAllAuthMenus();
+  var menu = document.getElementById('auth-menu-' + id);
+  if (menu) menu.classList.add('open');
+}
+</script>
 
 <style>
 .auth-overflow-btn:hover { background:#f5f7fa; }
@@ -4879,18 +4996,6 @@ document.addEventListener('DOMContentLoaded', renderAuthTable);
 .auth-menu-item-danger { color:#dc2626; }
 .auth-menu-item-danger:hover { background:#fef2f2; }
 </style>
-<script>
-function toggleAuthMenu(e, id) {
-  e.stopPropagation();
-  closeAllAuthMenus();
-  var menu = document.getElementById('auth-menu-' + id);
-  if (menu) menu.classList.add('open');
-}
-function closeAllAuthMenus() {
-  document.querySelectorAll('.auth-dropdown').forEach(function(m){ m.classList.remove('open'); });
-}
-document.addEventListener('click', closeAllAuthMenus);
-</script>
 
 </body>
 </html>
