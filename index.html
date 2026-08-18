@@ -812,7 +812,7 @@
       <svg class="nav-chevron open" id="auth-chevron" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M7 10l5 5 5-5z"/></svg>
     </div>
     <div class="nav-sub" id="auth-sub">
-      <div class="nav-sub-item active" id="sub-authenticators" onclick="showScreen('authenticators')">Authenticators</div>
+      
       <div class="nav-sub-item" id="sub-security-policies" onclick="showScreen('security-policies')">Auth policies</div>
       <div class="nav-sub-item" id="sub-recovery" onclick="showScreen('recovery')">Account settings</div>
       <div class="nav-sub-item" id="sub-customize" onclick="showScreen('customize')">Customize login</div>
@@ -849,61 +849,19 @@
   <!-- MAIN -->
   <main class="main">
 
-    <!-- ══ SCREEN: AUTHENTICATORS ══ -->
-    <div class="screen visible" id="screen-authenticators">
-      <div class="page-header">
-        <div class="page-title">Authenticators</div>
-        <div class="page-actions">
-          <button class="btn-primary" onclick="openAddAuthModal()">
-            Add authenticator
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-          </button>
-        </div>
-
-        <div class="tab-bar">
-          <div class="tab active" id="authtab-list" onclick="switchAuthTab('list')">All authenticators</div>
-          <div class="tab" id="authtab-trust" onclick="switchAuthTab('trust')">Trust conditions</div>
-        </div>
-      </div>
-
-      <div id="authcontent-list" class="content-area">
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th><button class="sort-btn">Authenticator <svg class="sort-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg></button></th>
-                <th><button class="sort-btn">Status <svg class="sort-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg></button></th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="auth-tbody"></tbody>
-          </table>
-          <div class="table-footer">
-            <select class="rows-select"><option>Show 25 rows</option><option>Show 50 rows</option></select>
-            <div class="pagination"><button class="pg-btn current">1</button></div>
-          </div>
-        </div>
-
-      </div>
-      <div id="authcontent-trust" style="display:none;flex:1;overflow:hidden;border-top:1px solid var(--border-primary);">
-        <div class="sp-list" id="trust-list"></div>
-        <div class="sp-detail" id="trust-detail"></div>
-      </div>
-    </div><!-- /screen-authenticators -->
-
     <!-- ══ SCREEN: SECURITY POLICIES ══ -->
-    <div class="screen" id="screen-security-policies">
+    <div class="screen visible" id="screen-security-policies">
       <div class="page-header">
         <div class="page-title">Auth policies</div>
         <div class="page-actions">
-          <button class="btn-primary" onclick="openPolicyWizardForActiveTab()">
-            Add policy
+          <button class="btn-primary" id="sp-add-btn" onclick="spAddAction()">
+            <span id="sp-add-label">Add authenticator</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
           </button>
         </div>
         <div class="tab-bar">
-          <div class="tab active" id="sptab-login" onclick="switchSpTab('login')">Login policy</div>
+          <div class="tab active" id="sptab-authenticators" onclick="switchSpTab('authenticators')">Authenticators</div>
+          <div class="tab" id="sptab-login" onclick="switchSpTab('login')">Login policy</div>
           <div class="tab" id="sptab-password" onclick="switchSpTab('password')">Password policy</div>
           <div class="tab" id="sptab-badge" onclick="switchSpTab('badge')">Badge management</div>
 
@@ -913,13 +871,39 @@
       <!-- MASTER-DETAIL BODY -->
       <div class="sp-body">
 
-        <!-- LEFT: POLICY LIST -->
-        <div class="sp-list" id="sp-list">
+        <!-- AUTHENTICATORS PANEL (full-width, shown when Authenticators tab active) -->
+        <div id="sp-panel-authenticators" style="display:flex;flex:1;flex-direction:column;overflow:hidden;">
+          <div class="content-area" style="flex:1;overflow-y:auto;">
+
+            <p style="font-size:15px;color:#3c404f;line-height:1.6;margin-bottom:6px;">Enable the authenticators your district supports. Once enabled, they become available to assign within <strong>Login policies</strong> — where you control which login methods and MFA options apply to specific user groups.</p>
+            <p style="font-size:14px;color:#6b7280;margin-bottom:20px;">To apply an authenticator to users, go to <a href="#" onclick="event.preventDefault();switchSpTab('login')" style="color:#1464ff;font-weight:600;text-decoration:none;">Login policy</a> and create or edit a policy for the relevant group.</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th><button class="sort-btn">Authenticator <svg class="sort-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg></button></th>
+                    <th><button class="sort-btn">Status <svg class="sort-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg></button></th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="auth-tbody"></tbody>
+              </table>
+              <div class="table-footer">
+                <select class="rows-select"><option>Show 25 rows</option><option>Show 50 rows</option></select>
+                <div class="pagination"><button class="pg-btn current">1</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LEFT: POLICY LIST (hidden when Authenticators tab active) -->
+        <div class="sp-list" id="sp-list" style="display:none;">
           <!-- populated by JS -->
         </div>
 
-        <!-- RIGHT: DETAIL PANEL -->
-        <div class="sp-detail" id="sp-detail">
+        <!-- RIGHT: DETAIL PANEL (hidden when Authenticators tab active) -->
+        <div class="sp-detail" id="sp-detail" style="display:none;">
           <!-- populated by JS -->
         </div>
 
@@ -1934,14 +1918,32 @@
   function switchSpTab(tab) {
     currentSpTab = tab;
     selectedPolicyId = null;
-    ['login','password','badge'].forEach(t => {
-      document.getElementById('sptab-' + t).classList.toggle('active', t === tab);
+    ['authenticators','login','password','badge'].forEach(t => {
+      const el = document.getElementById('sptab-' + t);
+      if (el) el.classList.toggle('active', t === tab);
     });
-    if (tab === 'badge') {
+    // Toggle add button label
+    const addLabel = document.getElementById('sp-add-label');
+    if (addLabel) addLabel.textContent = tab === 'authenticators' ? 'Add authenticator' : 'Add policy';
+
+    const authPanel = document.getElementById('sp-panel-authenticators');
+    const spList    = document.getElementById('sp-list');
+    const spDetail  = document.getElementById('sp-detail');
+
+    if (tab === 'authenticators') {
+      if (authPanel) authPanel.style.display = 'flex';
+      if (spList)    spList.style.display    = 'none';
+      if (spDetail)  spDetail.style.display  = 'none';
+      renderAuthTable();
+    } else if (tab === 'badge') {
+      if (authPanel) authPanel.style.display = 'none';
+      if (spList)    spList.style.display    = 'none';
+      if (spDetail)  spDetail.style.display  = '';
       renderBadgeManagement();
     } else {
-      document.getElementById('sp-list').style.display = '';
-      document.getElementById('sp-detail').style.padding = '32px 40px';
+      if (authPanel) authPanel.style.display = 'none';
+      if (spList)    spList.style.display    = '';
+      if (spDetail)  { spDetail.style.display = ''; spDetail.style.padding = '32px 40px'; }
       renderSpTab(tab);
     }
   }
@@ -2577,6 +2579,18 @@ function openPolicyWizardForActiveTab() {
     openLoginPolicyWizard();
   }
 }
+
+function spAddAction() {
+  if (typeof currentSpTab !== 'undefined' && currentSpTab === 'authenticators') {
+    openAddAuthModal();
+  } else {
+    openPolicyWizardForActiveTab();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  switchSpTab('authenticators');
+});
 </script>
 
 <!-- ══ LOGIN POLICY WIZARD v2 ══ -->
@@ -3121,22 +3135,29 @@ function lpwStep1() {
     ? selectedNames.map(function(n){ return '<span class="lpw-chip">' + n + '</span>'; }).join('')
     : '<span style="font-size:14px;color:#6b7280;">None selected</span>';
 
-  // Build login methods dynamically from active IdP authenticators
+  // Build login methods from ALL active authenticators (both IdP and MFA)
+  var labelMap = {
+    'google':    'Google Authentication',
+    'saml':      'SAML Authentication',
+    'clever_pw': 'Clever Passwords Authentication',
+    'canvas':    'Canvas Authentication',
+    'ldap':      'LDAP Authentication',
+    'badges':    'Badges Authentication',
+    'pictures':  'Pictures Authentication',
+    'pin':       'PIN Authentication',
+    'sms':       'Text Message (SMS)',
+    'totp':      'Authenticator App (TOTP)',
+    'webauthn':  'Passkey / WebAuthn'
+  };
   var methods = [];
   Object.keys(activeAuthenticators).forEach(function(id) {
+    if (authState[id] === false) return; // skip disabled
     var entry = AUTHENTICATOR_CATALOG[id];
-    if (entry && entry.category === 'idp') {
-      var labelMap = {
-        'google':    'Google Authentication',
-        'saml':      'SAML Authentication',
-        'clever_pw': 'Clever Passwords Authentication',
-        'canvas':    'Canvas Authentication',
-        'ldap':      'LDAP Authentication'
-      };
+    if (entry) {
       methods.push({key: id, label: labelMap[id] || entry.name, link: id === 'clever_pw', linkText: '', linkHref: '#'});
     }
   });
-  // Fallback: always show Clever Passwords if nothing else is active
+  // Fallback
   if (methods.length === 0) {
     methods.push({key: 'cp', label: 'Clever Passwords Authentication', link: true, linkText: '', linkHref: '#'});
   }
@@ -3198,17 +3219,15 @@ function lpwMfaStep(factor) {
     'totp':     {badge:'', desc:'User enters a TOTP code from an authenticator app (Google Authenticator, Authy, etc.).', link:'Read more about TOTP MFA'},
     'webauthn': {badge:'', desc:'User authenticates with a FIDO2 device, biometric, or hardware security key.', link:'Read more about Passkeys'}
   };
-  var methods = [];
-  Object.keys(activeAuthenticators).forEach(function(id) {
-    var entry = AUTHENTICATOR_CATALOG[id];
-    if (entry && entry.category === 'mfa') {
-      var details = mfaDetails[id] || {badge:'', desc:entry.desc, link:''};
-      methods.push(Object.assign({key: id, label: entry.name}, details));
-    }
-  });
-  if (methods.length === 0) {
-    methods = [{key:'badges', label:'Badges', badge:'Recommended for teachers and students', desc:'A user scans a printed QR code or badge as a second factor.', link:'Read more about Badges as an MFA method'}];
-  }
+  // Always show all MFA methods in this step
+  var methods = [
+    {key:'badges',   label:'Badges',             badge:'Recommended for teachers and students', desc:'A user scans a printed QR code or badge as a second factor.',                              link:'Read more about Badges as an MFA method'},
+    {key:'pictures', label:'Pictures',            badge:'Students only',                         desc:'Students identify themselves using picture selection.',                                     link:'Read more about Pictures as an MFA method'},
+    {key:'pin',      label:'PIN',                 badge:'Students only',                         desc:'Students enter a short numeric PIN as a second factor.',                                   link:'Read more about PIN as an MFA method'},
+    {key:'sms',      label:'Text Message (SMS)',  badge:'',                                       desc:'A one-time code is sent to the user verified mobile number.',                             link:'Read more about SMS MFA'},
+    {key:'totp',     label:'Authenticator App',   badge:'',                                       desc:'User enters a TOTP code from an authenticator app (Google Authenticator, Authy, etc.).', link:'Read more about TOTP MFA'},
+    {key:'webauthn', label:'Passkey / WebAuthn',  badge:'',                                       desc:'User authenticates with a FIDO2 device, biometric, or hardware security key.',           link:'Read more about Passkeys'}
+  ];
 
   var cards = '';
   for (var i = 0; i < methods.length; i++) {
@@ -4642,7 +4661,6 @@ function ppwSave() {
     </div>
 
     <!-- Identity Providers -->
-    <div class="add-auth-section-label">Identity Providers</div>
     <div class="add-auth-grid">
 
       <div class="auth-option-card" onclick="addAuthenticator('google');closeAddAuthModal();openGoogleAuthModal()">
@@ -4711,10 +4729,9 @@ function ppwSave() {
     </div>
 
     <!-- MFA Methods -->
-    <div class="add-auth-section-label">Multi-Factor Authentication (MFA)</div>
     <div class="add-auth-grid">
 
-      <div class="auth-option-card" onclick="addAuthenticator('pictures');closeAddAuthModal()">
+      <div class="auth-option-card" onclick="addAuthenticator('badges');closeAddAuthModal()">
         <div class="auth-option-card-header">
           <div class="auth-option-icon" style="background:#e8f5e9;">
             <span class="material-icons" style="font-size:20px;color:#2e7d32;">badge</span>
@@ -4727,70 +4744,7 @@ function ppwSave() {
         <div class="auth-option-req-item">Compatible badge reader hardware</div>
       </div>
 
-      <div class="auth-option-card" onclick="addAuthenticator('pin');closeAddAuthModal()">
-        <div class="auth-option-card-header">
-          <div class="auth-option-icon" style="background:#fce4ec;">
-            <span class="material-icons" style="font-size:20px;color:#c2185b;">image</span>
-          </div>
-          <div class="auth-option-name">Pictures</div>
-        </div>
-        <hr class="auth-option-divider"/>
-        <div class="auth-option-req-label">Requirements</div>
-        <div class="auth-option-req-item">Recommended for younger students (K–5)</div>
-        <div class="auth-option-req-item">Student photos synced via SIS</div>
-      </div>
-
-      <div class="auth-option-card" onclick="addAuthenticator('sms');closeAddAuthModal()">
-        <div class="auth-option-card-header">
-          <div class="auth-option-icon" style="background:#ede7f6;">
-            <span class="material-icons" style="font-size:20px;color:#512da8;">dialpad</span>
-          </div>
-          <div class="auth-option-name">PIN</div>
-        </div>
-        <hr class="auth-option-divider"/>
-        <div class="auth-option-req-label">Requirements</div>
-        <div class="auth-option-req-item">Recommended for students (K–8)</div>
-        <div class="auth-option-req-item">No additional hardware required</div>
-      </div>
-
-      <div class="auth-option-card" onclick="addAuthenticator('totp');closeAddAuthModal()">
-        <div class="auth-option-card-header">
-          <div class="auth-option-icon" style="background:#e3f2fd;">
-            <span class="material-icons" style="font-size:20px;color:#1565c0;">sms</span>
-          </div>
-          <div class="auth-option-name">Text Message (SMS)</div>
-        </div>
-        <hr class="auth-option-divider"/>
-        <div class="auth-option-req-label">Requirements</div>
-        <div class="auth-option-req-item">User must have a verified mobile phone number on file</div>
-      </div>
-
-      <div class="auth-option-card" onclick="addAuthenticator('webauthn');closeAddAuthModal()">
-        <div class="auth-option-card-header">
-          <div class="auth-option-icon" style="background:#fff8e1;">
-            <span class="material-icons" style="font-size:20px;color:#f9a825;">grid_view</span>
-          </div>
-          <div class="auth-option-name">Authenticator App (TOTP)</div>
-        </div>
-        <hr class="auth-option-divider"/>
-        <div class="auth-option-req-label">Requirements</div>
-        <div class="auth-option-req-item">User must install an authenticator app (Google Authenticator, Authy, etc.)</div>
-      </div>
-
-      <div class="auth-option-card" onclick="addAuthenticator('webauthn');closeAddAuthModal()">
-        <div class="auth-option-card-header">
-          <div class="auth-option-icon" style="background:#fafafa;">
-            <span class="material-icons" style="font-size:20px;color:#37474f;">fingerprint</span>
-          </div>
-          <div class="auth-option-name">Passkey / WebAuthn</div>
-        </div>
-        <hr class="auth-option-divider"/>
-        <div class="auth-option-req-label">Requirements</div>
-        <div class="auth-option-req-item">Device with biometrics or hardware security key (FIDO2)</div>
-      </div>
-
     </div>
-
     <div class="add-auth-footer">
       <button class="add-auth-cancel" onclick="closeAddAuthModal()">Cancel</button>
     </div>
@@ -4842,7 +4796,7 @@ function handleAddAuthOverlay(e) { if (e.target === document.getElementById('add
 <script>
 var AUTH_ROWS = [
   {id:'google',   name:'Google IdP',        desc:'Sign in with Google account',                             edit:true,  editFn:'openGoogleAuthModal()', active:true},
-  {id:'badges',   name:'Badges',            desc:'Physical or digital badge scan (Chrome, Windows, Badges+)', edit:false, editFn:'',                 active:true},
+  {id:'badges',   name:'Badges',            desc:'Physical or digital badge scan (Chrome, Windows, Badges+)', edit:true,  editFn:'openBadgesEditModal()', active:true},
   {id:'saml',     name:'SAML 2.0',          desc:'Enterprise SSO via SAML',                                 edit:true,  editFn:'openSamlModal()',      active:true},
   {id:'pictures', name:'Pictures',          desc:'Image-based authentication for younger students',          edit:false, editFn:'',                    active:true}
 ];
@@ -4852,7 +4806,7 @@ var AUTH_ROWS = [
 var AUTHENTICATOR_CATALOG = {
   'google':    {id:'google',    name:'Google IdP',        desc:'Sign in with Google account',                              category:'idp', edit:true,  editFn:'openGoogleAuthModal()'},
   'saml':      {id:'saml',      name:'SAML 2.0',          desc:'Enterprise SSO via SAML',                                  category:'idp', edit:true,  editFn:'openSamlModal()'},
-  'badges':    {id:'badges',    name:'Badges',             desc:'Physical or digital badge scan (Chrome, Windows, Badges+)', category:'mfa', edit:false, editFn:''},
+  'badges':    {id:'badges',    name:'Badges',             desc:'Physical or digital badge scan (Chrome, Windows, Badges+)', category:'mfa', edit:true,  editFn:'openBadgesEditModal()'},
   'pictures':  {id:'pictures',  name:'Pictures',           desc:'Image-based authentication for younger students',          category:'mfa', edit:false, editFn:''},
   'pin':       {id:'pin',       name:'PIN',                desc:'Numeric PIN for younger students',                         category:'mfa', edit:false, editFn:''},
   'sms':       {id:'sms',       name:'Text Message (SMS)', desc:'One-time code via SMS',                                    category:'mfa', edit:false, editFn:''},
@@ -4867,8 +4821,7 @@ var AUTHENTICATOR_CATALOG = {
 var activeAuthenticators = {
   'google':   true,
   'saml':     true,
-  'badges':   true,
-  'pictures': true
+  'badges':   true
 };
 
 function addAuthenticator(id) {
@@ -4996,6 +4949,253 @@ function toggleAuthMenu(e, id) {
 .auth-menu-item-danger { color:#dc2626; }
 .auth-menu-item-danger:hover { background:#fef2f2; }
 </style>
+
+<!-- ══ BADGES EDIT MODAL ══ -->
+<style>
+.badges-overlay {
+  display:none; position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,.45); align-items:center; justify-content:center;
+}
+.badges-overlay.open { display:flex; }
+.badges-box {
+  background:#fff; border-radius:12px; width:680px; max-width:95vw;
+  max-height:90vh; overflow-y:auto; padding:40px 48px 36px;
+  position:relative; font-family:'Proxima Nova',-apple-system,sans-serif;
+}
+.badges-close {
+  position:absolute; top:20px; right:24px;
+  background:none; border:none; cursor:pointer; font-size:26px;
+  color:#13151a; line-height:1; padding:4px;
+}
+.badges-close:hover { color:#1464ff; }
+.badges-title { font-size:28px; font-weight:700; color:#13151a; margin-bottom:28px; letter-spacing:-.3px; }
+
+/* Grade selector */
+.badges-label { font-size:16px; font-weight:600; color:#13151a; margin-bottom:10px; display:block; }
+.badges-grade-wrap {
+  border:1px solid #c7cdd6; border-radius:6px; padding:10px 12px;
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  min-height:52px; cursor:text; margin-bottom:20px;
+}
+.badges-grade-wrap:focus-within { border-color:#1464ff; }
+.badge-grade-tag {
+  display:inline-flex; align-items:center; gap:6px;
+  background:#e8eaf0; border-radius:4px;
+  font-size:14px; font-weight:500; color:#13151a;
+  padding:4px 10px;
+}
+.badge-grade-tag button {
+  background:none; border:none; cursor:pointer; color:#6b7280;
+  font-size:16px; line-height:1; padding:0; display:flex; align-items:center;
+}
+.badge-grade-tag button:hover { color:#dc2626; }
+.badges-grade-controls { display:flex; align-items:center; gap:4px; margin-left:auto; }
+.badges-grade-clear {
+  width:22px; height:22px; border-radius:50%; background:#13151a;
+  color:#fff; border:none; cursor:pointer; font-size:14px;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+.badges-grade-chevron {
+  background:none; border:none; cursor:pointer; color:#3c404f; padding:2px;
+  display:flex; align-items:center;
+}
+.badges-grade-dropdown {
+  display:none; position:absolute; z-index:10;
+  background:#fff; border:1px solid #e8eaf0; border-radius:6px;
+  box-shadow:0 4px 16px rgba(0,0,0,.12); padding:6px 0;
+  width:260px; max-height:300px; overflow-y:auto;
+}
+.badges-grade-dropdown.open { display:block; }
+.badges-grade-opt {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 16px; font-size:14px; color:#3c404f; cursor:pointer;
+}
+.badges-grade-opt:hover { background:#f5f7fa; }
+.badges-grade-opt.selected { color:#1464ff; font-weight:600; }
+
+/* Checkboxes */
+.badges-cb-row {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:14px; cursor:pointer;
+}
+.badges-cb-row span { font-size:16px; color:#13151a; }
+.bm-cb { width:24px; height:24px; flex-shrink:0; position:relative; }
+.bm-cb-inner {
+  position:absolute; top:3px; left:3px; width:18px; height:18px;
+  border-radius:3px; border:2px solid #1464ff; background:#fff;
+  display:flex; align-items:center; justify-content:center;
+}
+.bm-cb-inner.on { background:#1464ff; }
+.bm-cb-inner.on::after {
+  content:''; display:block; width:10px; height:7px;
+  border-left:2px solid #fff; border-bottom:2px solid #fff;
+  transform:rotate(-45deg) translateY(-1px);
+}
+
+/* Radio */
+.badges-radio-row {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:12px; cursor:pointer;
+}
+.badges-radio-row span { font-size:16px; color:#13151a; }
+.bm-radio { width:24px; height:24px; flex-shrink:0; position:relative; }
+.bm-radio-inner {
+  position:absolute; top:3px; left:3px; width:18px; height:18px;
+  border-radius:50%; border:2px solid #1464ff; background:#fff;
+  display:flex; align-items:center; justify-content:center;
+}
+.bm-radio-inner.on::after {
+  content:''; width:8px; height:8px; border-radius:50%; background:#1464ff;
+}
+
+.badges-section-label { font-size:16px; font-weight:600; color:#13151a; margin:24px 0 12px; display:block; }
+.badges-save-btn {
+  height:48px; padding:0 32px; background:#1464ff; color:#fff;
+  border:none; border-radius:4px; font-family:inherit; font-size:16px;
+  font-weight:600; cursor:pointer; margin-top:28px;
+}
+.badges-save-btn:hover { background:#0f55e0; }
+</style>
+
+<div class="badges-overlay" id="badges-edit-modal" onclick="handleBadgesOverlay(event)">
+  <div class="badges-box">
+    <button class="badges-close" onclick="closeBadgesEditModal()">&times;</button>
+    <div class="badges-title">Select students</div>
+
+    <!-- Grade selector -->
+    <label class="badges-label">Select grade(s)</label>
+    <div style="position:relative;">
+      <div class="badges-grade-wrap" id="bm-grade-wrap" onclick="toggleBadgesGradeDropdown()">
+        <div id="bm-grade-tags"></div>
+        <div class="badges-grade-controls">
+          <button class="badges-grade-clear" onclick="event.stopPropagation();bmClearGrades()" title="Clear all">&times;</button>
+          <button class="badges-grade-chevron" onclick="event.stopPropagation();toggleBadgesGradeDropdown()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#3c404f"><path d="M7 10l5 5 5-5z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="badges-grade-dropdown" id="bm-grade-dropdown"></div>
+    </div>
+
+    <!-- IEP / ELL checkboxes -->
+    <label class="badges-cb-row" onclick="bmToggle('includeIEP')">
+      <div class="bm-cb"><div class="bm-cb-inner" id="bm-cb-iep"></div></div>
+      <span>Include students with IEPs in all grades</span>
+    </label>
+    <label class="badges-cb-row" onclick="bmToggle('includeELL')">
+      <div class="bm-cb"><div class="bm-cb-inner" id="bm-cb-ell"></div></div>
+      <span>Include students who are ELL in all grades</span>
+    </label>
+
+    <!-- School selector -->
+    <span class="badges-section-label">From school(s)</span>
+    <label class="badges-radio-row" onclick="bmSetSchool('all')">
+      <div class="bm-radio"><div class="bm-radio-inner" id="bm-radio-all"></div></div>
+      <span>All schools</span>
+    </label>
+    <label class="badges-radio-row" onclick="bmSetSchool('specify')">
+      <div class="bm-radio"><div class="bm-radio-inner" id="bm-radio-specify"></div></div>
+      <span>Specify schools</span>
+    </label>
+    <div id="bm-school-list" style="display:none;margin-top:8px;padding-left:36px;font-size:14px;color:#6b7280;">
+      (School selector would appear here)
+    </div>
+
+    <button class="badges-save-btn" onclick="closeBadgesEditModal()">Save</button>
+  </div>
+</div>
+
+<script>
+var BM_GRADES = [
+  'Preschool','Transitional Kindergarten','Kindergarten',
+  'Grade 1','Grade 2','Grade 3','Grade 4','Grade 5',
+  'Grade 6','Grade 7','Grade 8','Grade 9','Grade 10',
+  'Grade 11','Grade 12','Grade 13'
+];
+
+var bmState = {
+  grades: ['Preschool','Transitional Kindergarten','Kindergarten','Grade 2','Grade 3','Grade 4','Grade 5','Grade 8','Grade 13'],
+  includeIEP: true,
+  includeELL: true,
+  school: 'all'
+};
+
+function openBadgesEditModal() {
+  document.getElementById('badges-edit-modal').classList.add('open');
+  bmRender();
+}
+function closeBadgesEditModal() {
+  document.getElementById('badges-edit-modal').classList.remove('open');
+  document.getElementById('bm-grade-dropdown').classList.remove('open');
+}
+function handleBadgesOverlay(e) {
+  if (e.target === document.getElementById('badges-edit-modal')) closeBadgesEditModal();
+}
+
+function bmRender() {
+  // Tags
+  var tagsEl = document.getElementById('bm-grade-tags');
+  tagsEl.innerHTML = bmState.grades.map(function(g) {
+    return '<span class="badge-grade-tag">' + g +
+      '<button onclick="event.stopPropagation();bmRemoveGrade(\'' + g.replace(/'/g, "\\'") + '\')">' +
+      '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' +
+      '</button></span>';
+  }).join('');
+
+  // Dropdown options
+  var ddEl = document.getElementById('bm-grade-dropdown');
+  ddEl.innerHTML = BM_GRADES.map(function(g) {
+    var sel = bmState.grades.indexOf(g) !== -1;
+    return '<div class="badges-grade-opt' + (sel ? ' selected' : '') + '" onclick="event.stopPropagation();bmToggleGrade(\'' + g.replace(/'/g, "\\'") + '\')">' +
+      (sel ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="#1464ff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>' :
+             '<svg width="16" height="16" viewBox="0 0 24 24" fill="transparent"><path d=""/></svg>') +
+      g + '</div>';
+  }).join('');
+
+  // Checkboxes
+  document.getElementById('bm-cb-iep').className = 'bm-cb-inner' + (bmState.includeIEP ? ' on' : '');
+  document.getElementById('bm-cb-ell').className = 'bm-cb-inner' + (bmState.includeELL ? ' on' : '');
+
+  // Radios
+  document.getElementById('bm-radio-all').className    = 'bm-radio-inner' + (bmState.school === 'all'     ? ' on' : '');
+  document.getElementById('bm-radio-specify').className = 'bm-radio-inner' + (bmState.school === 'specify' ? ' on' : '');
+  document.getElementById('bm-school-list').style.display = bmState.school === 'specify' ? 'block' : 'none';
+}
+
+function toggleBadgesGradeDropdown() {
+  document.getElementById('bm-grade-dropdown').classList.toggle('open');
+}
+function bmToggleGrade(g) {
+  var idx = bmState.grades.indexOf(g);
+  if (idx === -1) bmState.grades.push(g);
+  else bmState.grades.splice(idx, 1);
+  bmRender();
+}
+function bmRemoveGrade(g) {
+  bmState.grades = bmState.grades.filter(function(x){ return x !== g; });
+  bmRender();
+}
+function bmClearGrades() {
+  bmState.grades = [];
+  bmRender();
+}
+function bmToggle(key) {
+  bmState[key] = !bmState[key];
+  bmRender();
+}
+function bmSetSchool(val) {
+  bmState.school = val;
+  bmRender();
+}
+
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('bm-grade-dropdown');
+  var wrap = document.getElementById('bm-grade-wrap');
+  if (dd && wrap && !wrap.contains(e.target) && !dd.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+</script>
 
 </body>
 </html>
