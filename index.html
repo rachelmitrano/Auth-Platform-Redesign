@@ -815,6 +815,8 @@
       
       <div class="nav-sub-item" id="sub-security-policies" onclick="showScreen('security-policies')">Auth policies</div>
       <div class="nav-sub-item" id="sub-recovery" onclick="showScreen('recovery')">Account settings</div>
+      <div class="nav-sub-item" id="sub-trust-conditions" onclick="showScreen('trust-conditions')">Trust conditions</div>
+      <div class="nav-sub-item" id="sub-device-management" onclick="showScreen('device-management')">Device management</div>
       <div class="nav-sub-item" id="sub-customize" onclick="showScreen('customize')">Customize login</div>
       <div class="nav-sub-item" id="sub-logs" onclick="showScreen('logs')">Access logs</div>
     </div>
@@ -906,6 +908,7 @@
         <div class="sp-detail" id="sp-detail" style="display:none;">
           <!-- populated by JS -->
         </div>
+
 
       </div>
     </div>
@@ -1126,6 +1129,40 @@
           <button class="btn-outline" onclick="closeNotifWizard()">Cancel</button>
           <button class="btn-primary" onclick="closeNotifWizard()">Save</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN: TRUST CONDITIONS ══ -->
+    <div class="screen" id="screen-trust-conditions">
+      <div class="page-header">
+        <div class="page-title">Trust conditions</div>
+        <div class="page-actions">
+          <button class="btn-primary">
+            Add condition
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="sp-body">
+        <div class="sp-list" id="trust-list"></div>
+        <div class="sp-detail" id="trust-detail" style="padding:32px 40px;"></div>
+      </div>
+    </div>
+
+<!-- ══ SCREEN: DEVICE MANAGEMENT ══ -->
+    <div class="screen" id="screen-device-management">
+      <div class="page-header">
+        <div class="page-title">Device management</div>
+        <div class="page-actions">
+          <button class="btn-primary">
+            Add condition
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="sp-body">
+        <div class="sp-list" id="device-list"></div>
+        <div class="sp-detail" id="device-detail" style="padding:32px 40px;"></div>
       </div>
     </div>
 
@@ -1728,18 +1765,49 @@
   }
 
   const TRUST_DATA = [
-    { id: 'tc1', name: 'MDM Managed Devices', attrs: [
+    { id: 'tc1', name: 'Global session policy', attrs: [
+      { label: 'Description', value: 'Sets a universal session length and re-authentication cadence for all users across all devices.' },
+      { label: 'Applies to groups', value: 'Everyone' },
+      { label: 'Session length', value: '8 hours' },
+      { label: 'Re-auth frequency', value: 'Daily' },
+      { label: 'Status', value: 'Active' },
+    ]},
+    { id: 'tc2', name: 'High risk – block access', attrs: [
+      { label: 'Description', value: 'Blocks login attempts flagged as high risk based on device posture, IP reputation, or unusual activity.' },
+      { label: 'Applies to groups', value: 'Everyone' },
+      { label: 'Risk signal', value: 'High risk score (device posture, IP reputation)' },
+      { label: 'Effect', value: 'Block access and require admin review' },
+      { label: 'Status', value: 'Active' },
+    ]},
+  ];
+
+  const DEVICE_DATA = [
+    { id: 'dm1', name: 'MDM Managed Devices', attrs: [
       { label: 'Description', value: 'Trusts devices enrolled in district MDM.' },
       { label: 'Trust signal', value: 'MDM enrollment status' },
       { label: 'Applies to groups', value: 'Everyone' },
       { label: 'Effect', value: 'Skip MFA step-up on trusted device' },
       { label: 'Status', value: 'Active' },
     ]},
-    { id: 'tc2', name: 'CIDR Block – Campus Network', attrs: [
+    { id: 'dm2', name: 'CIDR Block – Campus Network', attrs: [
       { label: 'Description', value: 'Trusts logins originating from on-campus IP range.' },
       { label: 'Trust signal', value: 'IP range: 10.0.0.0/8' },
       { label: 'Applies to groups', value: 'Teachers, Staff' },
       { label: 'Effect', value: 'Reduce re-auth frequency to weekly' },
+      { label: 'Status', value: 'Active' },
+    ]},
+    { id: 'dm3', name: 'Chrome', attrs: [
+      { label: 'Description', value: 'Manages device trust for district-issued Chromebooks via Chrome Device Management.' },
+      { label: 'Trust signal', value: 'Chrome Enterprise enrollment' },
+      { label: 'Applies to groups', value: 'Everyone' },
+      { label: 'Effect', value: 'Skip MFA on enrolled Chromebooks' },
+      { label: 'Status', value: 'Active' },
+    ]},
+    { id: 'dm4', name: 'Windows', attrs: [
+      { label: 'Description', value: 'Manages device trust for district-issued Windows devices via MDM or Intune enrollment.' },
+      { label: 'Trust signal', value: 'Windows MDM / Intune enrollment' },
+      { label: 'Applies to groups', value: 'Staff, Teachers' },
+      { label: 'Effect', value: 'Skip MFA on enrolled Windows devices' },
       { label: 'Status', value: 'Active' },
     ]},
   ];
@@ -1764,13 +1832,59 @@
   function renderTrustDetail(id) {
     const p = TRUST_DATA.find(x => x.id === id);
     if (!p) return;
-    const rows = p.attrs.filter(a => a.value).map(a => '<tr><td>' + a.label + '</td><td>' + a.value + '</td></tr>').join('');
+
+    // Build "Login allowed if" conditions from the policy attrs
+    const desc       = p.attrs.find(a => a.label === 'Description');
+    const groups     = p.attrs.find(a => a.label === 'Applies to groups');
+    const conditions = p.attrs.filter(a => !['Description','Applies to groups','Status'].includes(a.label));
+
+    const condRows = conditions.length
+      ? conditions.map(a => '<li style="font-size:14px;color:#13151a;line-height:1.8;">' + a.label + ': <strong>' + a.value + '</strong></li>').join('')
+      : '<li style="font-size:14px;color:#6b7280;">All conditions met (no restrictions set)</li>';
+
+    const notAllowedText = 'Access is blocked and the user is notified when one or more of the above conditions are not met.';
+
     document.getElementById('trust-detail').innerHTML =
-      '<div class="sp-detail-header"><div class="sp-detail-title">' + p.name + '</div>'
-      + '<div class="sp-detail-actions"><button class="btn-outline danger">Delete</button><button class="btn-outline">Edit</button></div></div>'
-      + '<table class="attr-table"><thead><tr><th>Attribute</th><th>Configuration</th></tr></thead><tbody>' + rows + '</tbody></table>';
+      '<div class="sp-detail-header">' +
+        '<div class="sp-detail-title">' + p.name + '</div>' +
+        '<div class="sp-detail-actions"><button class="btn-outline btn-sm">Edit</button></div>' +
+      '</div>' +
+      '<table class="attr-table"><thead><tr><th>Attribute</th><th>Configuration</th></tr></thead><tbody>' +
+        (desc    ? '<tr><td>Description</td><td>' + desc.value + '</td></tr>' : '') +
+        (groups  ? '<tr><td>Applies to groups</td><td>' + groups.value + '</td></tr>' : '') +
+        '<tr><td style="vertical-align:top;padding-top:14px;">Login allowed if</td><td><ul style="margin:0;padding-left:18px;">' + condRows + '</ul></td></tr>' +
+        '<tr><td style="vertical-align:top;padding-top:14px;">Logins not allowed if</td><td style="font-size:14px;color:#13151a;">' + notAllowedText + '</td></tr>' +
+      '</tbody></table>';
   }
 
+  function renderDeviceList() {
+    const list = document.getElementById('device-list');
+    if (!list) return;
+    list.innerHTML = '<div style="padding:8px 12px 4px;"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-secondary);">Conditions</span></div>'
+      + DEVICE_DATA.map((p, i) => '<div class="sp-list-item" id="dmitem-' + p.id + '" onclick="selectDevice(\'' + p.id + '\')">'
+        + '<span class="sp-item-num">' + (i+1) + '</span>'
+        + '<span class="sp-item-name">' + p.name + '</span>'
+        + '</div>').join('');
+  }
+
+  function selectDevice(id) {
+    document.querySelectorAll('[id^="dmitem-"]').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById('dmitem-' + id);
+    if (el) el.classList.add('active');
+    renderDeviceDetail(id);
+  }
+
+  function renderDeviceDetail(id) {
+    const p = DEVICE_DATA.find(x => x.id === id);
+    if (!p) return;
+    const rows = p.attrs.filter(a => a.value).map(a => '<tr><td>' + a.label + '</td><td>' + a.value + '</td></tr>').join('');
+    const detail = document.getElementById('device-detail');
+    if (!detail) return;
+    detail.innerHTML =
+      '<div class="sp-detail-header"><div class="sp-detail-title">' + p.name + '</div>'
+      + '<div class="sp-detail-actions"><button class="btn-outline btn-sm">Edit</button></div></div>'
+      + '<table class="detail-table"><tbody>' + rows + '</tbody></table>';
+  }
 
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('visible'));
@@ -1781,6 +1895,8 @@
     if (subEl) subEl.classList.add('active');
     if (id === 'security-policies') renderSpTab('login');
     if (id === 'authenticators') renderTrustList();
+    if (id === 'trust-conditions') { renderTrustList(); selectTrust(TRUST_DATA[0].id); }
+    if (id === 'device-management') { renderDeviceList(); selectDevice(DEVICE_DATA[0].id); }
     if (id === 'recovery') { renderClaimingList(); renderNotifList(); }
   }
 
@@ -1923,27 +2039,35 @@
       if (el) el.classList.toggle('active', t === tab);
     });
     // Toggle add button label
+    const labelMap = {
+      'authenticators': 'Add authenticator',
+      'login':          'Add login policy',
+      'password':       'Add password policy',
+      'trust':          'Add trust condition'
+    };
+    const addBtn = document.getElementById('sp-add-btn');
     const addLabel = document.getElementById('sp-add-label');
-    if (addLabel) addLabel.textContent = tab === 'authenticators' ? 'Add authenticator' : 'Add policy';
+    if (addBtn) addBtn.style.display = tab === 'badge' ? 'none' : '';
+    if (addLabel) addLabel.textContent = labelMap[tab] || 'Add policy';
 
-    const authPanel = document.getElementById('sp-panel-authenticators');
-    const spList    = document.getElementById('sp-list');
-    const spDetail  = document.getElementById('sp-detail');
+    const authPanel  = document.getElementById('sp-panel-authenticators');
+    const spList     = document.getElementById('sp-list');
+    const spDetail   = document.getElementById('sp-detail');
+
+    // Hide everything first
+    [authPanel, spList, spDetail].forEach(function(el) {
+      if (el) el.style.display = 'none';
+    });
 
     if (tab === 'authenticators') {
       if (authPanel) authPanel.style.display = 'flex';
-      if (spList)    spList.style.display    = 'none';
-      if (spDetail)  spDetail.style.display  = 'none';
       renderAuthTable();
     } else if (tab === 'badge') {
-      if (authPanel) authPanel.style.display = 'none';
-      if (spList)    spList.style.display    = 'none';
-      if (spDetail)  spDetail.style.display  = '';
+      if (spDetail) spDetail.style.display = '';
       renderBadgeManagement();
     } else {
-      if (authPanel) authPanel.style.display = 'none';
-      if (spList)    spList.style.display    = '';
-      if (spDetail)  { spDetail.style.display = ''; spDetail.style.padding = '32px 40px'; }
+      if (spList)   spList.style.display   = '';
+      if (spDetail) { spDetail.style.display = ''; spDetail.style.padding = '32px 40px'; }
       renderSpTab(tab);
     }
   }
@@ -1995,7 +2119,7 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
             Delete
           </button>
-          <button class="btn-outline">
+          <button class="btn-outline" onclick="lpwEdit('${policy.id}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
             Edit
           </button>
@@ -3135,44 +3259,46 @@ function lpwStep1() {
     ? selectedNames.map(function(n){ return '<span class="lpw-chip">' + n + '</span>'; }).join('')
     : '<span style="font-size:14px;color:#6b7280;">None selected</span>';
 
-  // Build login methods from ALL active authenticators (both IdP and MFA)
-  var labelMap = {
-    'google':    'Google Authentication',
-    'saml':      'SAML Authentication',
-    'clever_pw': 'Clever Passwords Authentication',
-    'canvas':    'Canvas Authentication',
-    'ldap':      'LDAP Authentication',
-    'badges':    'Badges Authentication',
-    'pictures':  'Pictures Authentication',
-    'pin':       'PIN Authentication',
-    'sms':       'Text Message (SMS)',
-    'totp':      'Authenticator App (TOTP)',
-    'webauthn':  'Passkey / WebAuthn'
-  };
-  var methods = [];
-  Object.keys(activeAuthenticators).forEach(function(id) {
-    if (authState[id] === false) return; // skip disabled
-    var entry = AUTHENTICATOR_CATALOG[id];
-    if (entry) {
-      methods.push({key: id, label: labelMap[id] || entry.name, link: id === 'clever_pw', linkText: '', linkHref: '#'});
-    }
-  });
-  // Fallback
-  if (methods.length === 0) {
-    methods.push({key: 'cp', label: 'Clever Passwords Authentication', link: true, linkText: '', linkHref: '#'});
-  }
+  // All possible login methods — enabled ones selectable, disabled ones greyed with link
+  var ALL_LOGIN_METHODS = [
+    {key:'google',    label:'Google Authentication',           cat:'idp'},
+    {key:'saml',      label:'SAML Authentication',             cat:'idp'},
+    {key:'badges',    label:'Badges Authentication',           cat:'mfa'},
+    {key:'clever_pw', label:'Clever Passwords',                cat:'idp', isConfigure:true},
+    {key:'canvas',    label:'Canvas Authentication',           cat:'idp'},
+    {key:'ldap',      label:'LDAP Authentication',             cat:'idp'},
+    {key:'pictures',  label:'Pictures Authentication',         cat:'mfa'},
+    {key:'pin',       label:'PIN Authentication',              cat:'mfa'},
+    {key:'sms',       label:'Text Message (SMS)',              cat:'mfa'},
+    {key:'totp',      label:'Authenticator App (TOTP)',        cat:'mfa'},
+    {key:'webauthn',  label:'Passkey / WebAuthn',             cat:'mfa'}
+  ];
 
   var cards = '';
-  for (var i = 0; i < methods.length; i++) {
-    var m = methods[i];
-    var on = !!lpwS.loginMethods[m.key];
+  for (var i = 0; i < ALL_LOGIN_METHODS.length; i++) {
+    var m = ALL_LOGIN_METHODS[i];
+    var isEnabled = !!(activeAuthenticators[m.key] && authState[m.key] !== false);
+    var on = isEnabled && !!lpwS.loginMethods[m.key];
     var cbInner = on ? 'lpw-cb-inner checked' : 'lpw-cb-inner';
-    cards += '<div class="lpw-mfa-card' + (on ? ' checked' : '') + '" style="padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="lpwS.loginMethods[\'' + m.key + '\']=!lpwS.loginMethods[\'' + m.key + '\'];lpwStep1()">';
-    cards += '<div class="lpw-cb"><div class="' + cbInner + '"></div></div>';
-    cards += '<span class="lpw-mfa-name">' + m.label + '</span>';
-    if (m.link) cards += '<svg width="18" height="18" viewBox="0 0 24 24" fill="#1464ff" style="margin-left:auto;"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>';
-    cards += '</div>';
+
+    if (isEnabled) {
+      // Enabled: full selectable card
+      cards += '<div class="lpw-mfa-card' + (on ? ' checked' : '') + '" style="padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;" data-lpwkey="' + m.key + '" onclick="lpwLoginCardClick(this)">';
+      cards += '<div class="lpw-cb"><div class="' + cbInner + '"></div></div>';
+      cards += '<span class="lpw-mfa-name">' + m.label + '</span>';
+      cards += '</div>';
+    } else {
+      // Not enabled: greyed card with Configure/Enable button
+      var btnLabel = m.isConfigure ? 'Configure' : 'Enable';
+      cards += '<div class="lpw-mfa-card" style="padding:16px;display:flex;align-items:center;gap:12px;opacity:0.55;cursor:default;">';
+      cards += '<div class="lpw-cb"><div class="lpw-cb-inner" style="border-color:#c7cdd6;"></div></div>';
+      cards += '<span class="lpw-mfa-name" style="color:#6b7280;">' + m.label + '</span>';
+      cards += '<span class="lpw-enable-link" data-tab="authenticators" onclick="switchSpTab(this.dataset.tab)" style="margin-left:auto;font-size:14px;font-weight:600;color:#1464ff;cursor:pointer;white-space:nowrap;">' + btnLabel + ' ↗</span>';
+      cards += '</div>';
+    }
   }
+
+
 
   document.getElementById('lpw-content').innerHTML =
     '<div class="lpw-step-h1">Assign login methods</div>' +
@@ -3219,70 +3345,57 @@ function lpwMfaStep(factor) {
     'totp':     {badge:'', desc:'User enters a TOTP code from an authenticator app (Google Authenticator, Authy, etc.).', link:'Read more about TOTP MFA'},
     'webauthn': {badge:'', desc:'User authenticates with a FIDO2 device, biometric, or hardware security key.', link:'Read more about Passkeys'}
   };
-  // Always show all MFA methods in this step
-  var methods = [
-    {key:'badges',   label:'Badges',             badge:'Recommended for teachers and students', desc:'A user scans a printed QR code or badge as a second factor.',                              link:'Read more about Badges as an MFA method'},
-    {key:'pictures', label:'Pictures',            badge:'Students only',                         desc:'Students identify themselves using picture selection.',                                     link:'Read more about Pictures as an MFA method'},
-    {key:'pin',      label:'PIN',                 badge:'Students only',                         desc:'Students enter a short numeric PIN as a second factor.',                                   link:'Read more about PIN as an MFA method'},
-    {key:'sms',      label:'Text Message (SMS)',  badge:'',                                       desc:'A one-time code is sent to the user verified mobile number.',                             link:'Read more about SMS MFA'},
-    {key:'totp',     label:'Authenticator App',   badge:'',                                       desc:'User enters a TOTP code from an authenticator app (Google Authenticator, Authy, etc.).', link:'Read more about TOTP MFA'},
-    {key:'webauthn', label:'Passkey / WebAuthn',  badge:'',                                       desc:'User authenticates with a FIDO2 device, biometric, or hardware security key.',           link:'Read more about Passkeys'}
+  // Always show all MFA methods grouped by category
+  var methodGroups = [
+    { groupLabel: 'What you have', methods: [
+      {key:'badges',   label:'Badges',            desc:'A user scans a printed QR code or badge as a second factor.',                              link:'Read more about Badges as an MFA method'},
+      {key:'sms',      label:'Text Message (SMS)', desc:'A one-time code is sent to the user verified mobile number.',                             link:'Read more about SMS MFA'},
+      {key:'totp',     label:'Authenticator App',  desc:'User enters a TOTP code from an authenticator app (Google Authenticator, Authy, etc.).', link:'Read more about TOTP MFA'}
+    ]},
+    { groupLabel: 'What you know', methods: [
+      {key:'pin',      label:'PIN',      desc:'Students enter a short numeric PIN as a second factor.',  link:'Read more about PIN as an MFA method'},
+      {key:'pictures', label:'Pictures', desc:'Students identify themselves using picture selection.',    link:'Read more about Pictures as an MFA method'}
+    ]},
+    { groupLabel: 'What you are', methods: [
+      {key:'webauthn', label:'Passkey / WebAuthn', desc:'User authenticates with a FIDO2 device, biometric, or hardware security key.', link:'Read more about Passkeys'}
+    ]}
   ];
 
   var cards = '';
-  for (var i = 0; i < methods.length; i++) {
-    var m = methods[i];
-    var on = !!lpwS[mfaKey][m.key];
-    var cbInner = on ? 'lpw-cb-inner checked' : 'lpw-cb-inner';
-    var cardBorder = on ? ' checked' : '';
+  for (var g = 0; g < methodGroups.length; g++) {
+    var group = methodGroups[g];
+    cards += '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.6px;margin:20px 0 10px;">' + group.groupLabel + '</div>';
+    for (var i = 0; i < group.methods.length; i++) {
+      var m = group.methods[i];
+      var on = !!lpwS[mfaKey][m.key];
+      var cbInner = on ? 'lpw-cb-inner checked' : 'lpw-cb-inner';
+      var cardBorder = on ? ' checked' : '';
+      var req = lpwS[reqKey][m.key] || 'allowed';
 
-    cards += '<div class="lpw-mfa-card' + cardBorder + '">';
+      cards += '<div class="lpw-mfa-card' + cardBorder + '">';
+      cards += '<div class="lpw-mfa-card-header">';
+      // Use data attributes to avoid quote nesting
+      cards += '<div class="lpw-mfa-card-left" data-mfakey="' + mfaKey + '" data-mkey="' + m.key + '" data-stepfn="' + stepFn + '" onclick="lpwMfaToggle(this)">';
+      cards += '<div class="lpw-cb"><div class="' + cbInner + '"></div></div>';
+      cards += '<span class="lpw-mfa-name">' + m.label + '</span>';
+      cards += '</div></div>';
 
-    // Header row
-    cards += '<div class="lpw-mfa-card-header">';
-    cards += '<div class="lpw-mfa-card-left" onclick="lpwS[\'' + mfaKey + '\'][\'' + m.key + '\']=!lpwS[\'' + mfaKey + '\'][\'' + m.key + '\'];' + stepFn + '">';
-    cards += '<div class="lpw-cb"><div class="' + cbInner + '"></div></div>';
-    cards += '<span class="lpw-mfa-name">' + m.label + '</span>';
-    cards += '</div>';
-    if (m.badge) cards += '<div class="lpw-badge">' + m.badge + '</div>';
-    cards += '</div>';
-
-    if (on) {
-      // Description
-      if (m.descHtml) {
-        cards += '<div class="lpw-mfa-body">' + m.descHtml + '</div>';
-        // Picture type radios
-        cards += '<div style="padding:0 16px 12px;">';
-        var picOpts = [{v:'cartoons',l:'Cartoons (for younger students)'},{v:'photos',l:'Photos (For older students)'}];
-        for (var j = 0; j < picOpts.length; j++) {
-          var psel = lpwS[picKey][m.key] === picOpts[j].v;
-          cards += '<div class="lpw-radio-opt" style="margin-bottom:8px;" onclick="event.stopPropagation();lpwS[\'' + picKey + '\'][\'' + m.key + '\']=\'' + picOpts[j].v + '\';' + stepFn + '">';
-          cards += '<div class="lpw-radio-outer"><div class="lpw-radio-inner' + (psel ? ' selected' : '') + '"></div></div>';
-          cards += picOpts[j].l;
-          cards += '</div>';
-        }
+      if (on) {
+        if (m.desc) cards += '<div class="lpw-mfa-body">' + m.desc + '</div>';
+        if (m.link) cards += '<div class="lpw-mfa-link"><a href="#" target="_blank">' + m.link + '</a></div>';
+        cards += '<hr class="lpw-mfa-hr" />';
+        cards += '<div class="lpw-mfa-radios">';
+        cards += '<div class="lpw-radio-opt" data-reqkey="' + reqKey + '" data-mkey="' + m.key + '" data-val="allowed" data-stepfn="' + stepFn + '" onclick="lpwReqToggle(this)">';
+        cards += '<div class="lpw-radio-outer"><div class="lpw-radio-inner' + (req === 'allowed' ? ' selected' : '') + '"></div></div>';
+        cards += 'Allowed method</div>';
+        cards += '<div class="lpw-radio-opt" data-reqkey="' + reqKey + '" data-mkey="' + m.key + '" data-val="required" data-stepfn="' + stepFn + '" onclick="lpwReqToggle(this)">';
+        cards += '<div class="lpw-radio-outer"><div class="lpw-radio-inner' + (req === 'required' ? ' selected' : '') + '"></div></div>';
+        cards += 'Required method</div>';
         cards += '</div>';
-      } else if (m.desc) {
-        cards += '<div class="lpw-mfa-body">' + m.desc + '</div>';
       }
-      if (m.link) {
-        cards += '<div class="lpw-mfa-link"><a href="' + (m.href||'#') + '" target="_blank">' + m.link + '</a></div>';
-      }
-      // Divider
-      cards += '<hr class="lpw-mfa-hr" />';
-      // Allowed / Required radios
-      var req = lpwS[reqKey][m.key];
-      cards += '<div class="lpw-mfa-radios">';
-      cards += '<div class="lpw-radio-opt" onclick="event.stopPropagation();lpwS[\'' + reqKey + '\'][\'' + m.key + '\']=\'allowed\';' + stepFn + '">';
-      cards += '<div class="lpw-radio-outer"><div class="lpw-radio-inner' + (req === 'allowed' ? ' selected' : '') + '"></div></div>';
-      cards += 'Allowed method</div>';
-      cards += '<div class="lpw-radio-opt" onclick="event.stopPropagation();lpwS[\'' + reqKey + '\'][\'' + m.key + '\']=\'required\';' + stepFn + '">';
-      cards += '<div class="lpw-radio-outer"><div class="lpw-radio-inner' + (req === 'required' ? ' selected' : '') + '"></div></div>';
-      cards += 'Required method</div>';
+
       cards += '</div>';
     }
-
-    cards += '</div>'; // end card
   }
 
   var factorLabel = isFirst ? 'First factor MFA' : 'Second factor MFA';
@@ -3448,13 +3561,40 @@ function lpwSave() {
       {label:'MFA enforcement',             value: enfMap[lpwS.mfaEnf]},
       {label:'Re-authentication frequency', value: freqMap[lpwS.mfaFreq]},
       {label:'Status',                      value: 'Active'}
-    ]
+    ],
+    _savedState: savedState
   });
 
   lpwClose();
   showScreen('security-policies');
   switchSpTab('login');
   setTimeout(function(){ selectPolicy(newId, 'login'); }, 150);
+}
+
+function lpwEdit(policyId) {
+  var policy = SP_DATA.login.find(function(p){ return p.id === policyId; });
+  if (!policy) return;
+  if (policy._savedState) {
+    lpwS = JSON.parse(JSON.stringify(policy._savedState));
+    lpwS._editingId = policyId;
+  } else {
+    lpwReset();
+    lpwS._editingId = policyId;
+    lpwS.policyName = policy.name;
+  }
+  document.getElementById('lpw').classList.add('open');
+  lpwRender();
+}
+
+function lpwMfaToggle(el) {
+  var mk = el.dataset.mfakey, k = el.dataset.mkey, fn = el.dataset.stepfn;
+  lpwS[mk][k] = !lpwS[mk][k];
+  if (fn === 'lpwStep2()') lpwStep2(); else lpwStep3();
+}
+function lpwReqToggle(el) {
+  var rk = el.dataset.reqkey, k = el.dataset.mkey, v = el.dataset.val, fn = el.dataset.stepfn;
+  lpwS[rk][k] = v;
+  if (fn === 'lpwStep2()') lpwStep2(); else lpwStep3();
 }
 </script>
 
@@ -3577,22 +3717,19 @@ function lpwStepTrust() {
       '<textarea style="width:100%;height:80px;border:1px solid #c7cdd6;border-radius:4px;padding:8px 10px;font-family:inherit;font-size:14px;resize:vertical;outline:none;box-sizing:border-box;"></textarea>' +
       '<div style="margin-top:6px;font-size:13px;color:#6b7280;line-height:1.5;">This is an optional advanced setting. If the expression is formatted incorrectly or conflicts with conditions set above, the rule may not match any users.</div>' +
       '<div style="margin-top:6px;"><a href="#" style="color:#1464ff;font-size:14px;font-weight:600;">Expression language reference &#8599;</a></div>'
+    ) +
+    andRow('The time of login is',
+      radio('tc_loginTime','anytime','Anytime') +
+      radio('tc_loginTime','between','Between two specific times') +
+      radio('tc_loginTime','after','After a specific time')
     );
 
-  var timeRow =
-    '<div style="display:flex;align-items:flex-start;gap:0;padding:14px 0;">' +
-      '<div style="width:300px;flex-shrink:0;display:flex;align-items:flex-start;gap:8px;padding-top:2px;">' +
-        '<span style="font-size:15px;font-weight:700;color:#13151a;margin-right:4px;">AND</span>' +
-        '<span style="font-size:15px;color:#13151a;">The time of login is</span>' +
-      '</div>' +
-      '<div style="flex:1;display:flex;flex-direction:column;gap:8px;">' +
-        radio('tc_loginTime','anytime','Anytime') +
-        radio('tc_loginTime','between','Between two specific times') +
-        radio('tc_loginTime','after','After a specific time') +
-      '</div>' +
-    '</div>';
-
-  var thenBox =
+  document.getElementById('lpw-content').innerHTML =
+    '<div class="lpw-step-h1">Trust conditions <span style="font-size:16px;font-weight:400;color:#6b7280;">(optional)</span></div>' +
+    '<div class="lpw-step-sub">Configure conditions that control when and how users are allowed to log in.</div>' +
+    '<div style="font-size:16px;font-weight:600;color:#13151a;margin-bottom:16px;">IF</div>' +
+    '<div style="border:1px solid #e8eaf0;border-radius:6px;background:#fff;padding:0 20px;">' + rows + '</div>' +
+    thenBox;
     '<div style="border:2px solid #1464ff;border-radius:6px;padding:16px 20px;margin-top:16px;background:#fff;">' +
       '<div style="font-size:14px;font-weight:700;color:#13151a;margin-bottom:12px;">THEN</div>' +
       '<div style="display:flex;align-items:flex-start;gap:0;padding:8px 0;border-bottom:1px solid #e8eaf0;">' +
@@ -3602,7 +3739,8 @@ function lpwStepTrust() {
         '</div>' +
         '<div style="flex:1;">' +
           radio('tc_access','denied','Denied') +
-          radio('tc_access','allowed','Allowed after successful authentication') +
+          radio('tc_access','allowed_auth','Allowed after successful authentication') +
+          radio('tc_access','allowed','Allowed') +
         '</div>' +
       '</div>' +
       '<div style="display:flex;align-items:center;gap:0;padding:12px 0;">' +
@@ -3619,7 +3757,7 @@ function lpwStepTrust() {
   document.getElementById('lpw-content').innerHTML =
     '<div class="lpw-step-h1">Trust conditions <span style="font-size:16px;font-weight:400;color:#6b7280;">(optional)</span></div>' +
     '<div class="lpw-step-sub">Configure conditions that control when and how users are allowed to log in.</div>' +
-    '<div style="font-size:16px;font-weight:600;color:#13151a;margin-bottom:16px;">Allow users to login if</div>' +
+    '<div style="font-size:16px;font-weight:600;color:#13151a;margin-bottom:16px;">IF</div>' +
     '<div style="border:1px solid #e8eaf0;border-radius:6px;background:#fff;padding:0 20px;">' + rows + '</div>' +
     '<div style="padding:0 20px;">' + timeRow + '</div>' +
     thenBox;
@@ -3769,8 +3907,9 @@ lpwSave = function() {
   if (lpwS.trustConditions && lpwS.trustConditions.mdm) trustList.push('MDM managed devices');
   if (lpwS.trustConditions && lpwS.trustConditions.cidr) trustList.push('IP range / CIDR block');
 
-  var newId = 'lp_' + Date.now();
-  SP_DATA.login.push({
+  var editingId = lpwS._editingId || null;
+  var newId = editingId || ('lp_' + Date.now());
+  var policyObj = {
     id: newId,
     name: name,
     attrs: [
@@ -3782,8 +3921,15 @@ lpwSave = function() {
       {label:'Re-authentication frequency',  value: freqMap[lpwS.mfaReauthFreq] || 'Every login'},
       {label:'Guardian bypass',              value: lpwS.mfaGuardianBypass ? 'Enabled' : 'Disabled'},
       {label:'Status',                       value: 'Active'}
-    ]
-  });
+    ],
+    _savedState: JSON.parse(JSON.stringify(lpwS))
+  };
+  if (editingId) {
+    var idx = SP_DATA.login.findIndex(function(p){ return p.id === editingId; });
+    if (idx !== -1) SP_DATA.login[idx] = policyObj;
+  } else {
+    SP_DATA.login.push(policyObj);
+  }
 
   lpwClose();
   showScreen('security-policies');
