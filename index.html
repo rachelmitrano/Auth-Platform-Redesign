@@ -3161,7 +3161,7 @@ function lpwRenderFooter() {
 
 /* ── Content dispatcher ── */
 function lpwRenderContent() {
-  var fns = [lpwStep0, lpwStep1, lpwStep2, lpwStep3, lpwStep4, lpwStep5];
+  var fns = [lpwStep0, lpwStep1, lpwStep2, lpwStepTrust, lpwStep4, lpwStep5, lpwStep6];
   fns[lpwS.step]();
 }
 
@@ -3730,7 +3730,8 @@ function lpwStepTrust() {
     '<div style="font-size:16px;font-weight:600;color:#13151a;margin-bottom:16px;">IF</div>' +
     '<div style="border:1px solid #e8eaf0;border-radius:6px;background:#fff;padding:0 20px;">' + rows + '</div>' +
     thenBox;
-    '<div style="border:2px solid #1464ff;border-radius:6px;padding:16px 20px;margin-top:16px;background:#fff;">' +
+  var thenBox =
+        '<div style="border:2px solid #1464ff;border-radius:6px;padding:16px 20px;margin-top:16px;background:#fff;">' +
       '<div style="font-size:14px;font-weight:700;color:#13151a;margin-bottom:12px;">THEN</div>' +
       '<div style="display:flex;align-items:flex-start;gap:0;padding:8px 0;border-bottom:1px solid #e8eaf0;">' +
         '<div style="width:280px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding-top:2px;">' +
@@ -3754,13 +3755,6 @@ function lpwStepTrust() {
       '</div>' +
     '</div>';
 
-  document.getElementById('lpw-content').innerHTML =
-    '<div class="lpw-step-h1">Trust conditions <span style="font-size:16px;font-weight:400;color:#6b7280;">(optional)</span></div>' +
-    '<div class="lpw-step-sub">Configure conditions that control when and how users are allowed to log in.</div>' +
-    '<div style="font-size:16px;font-weight:600;color:#13151a;margin-bottom:16px;">IF</div>' +
-    '<div style="border:1px solid #e8eaf0;border-radius:6px;background:#fff;padding:0 20px;">' + rows + '</div>' +
-    '<div style="padding:0 20px;">' + timeRow + '</div>' +
-    thenBox;
 }
 
 
